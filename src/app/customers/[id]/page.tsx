@@ -33,34 +33,7 @@ export default async function CustomerProfilePage({ params }: { params: { id: st
         </div>
       </div>
       <div className="grid gap-6 md:grid-cols-3">
-        <div className="md:col-span-1 flex flex-col gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>معلومات الاتصال</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="flex items-center gap-3">
-                <Mail className="h-4 w-4 text-muted-foreground" />
-                <a href={`mailto:${customer.email}`} className="hover:underline">{customer.email}</a>
-              </div>
-              <div className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-muted-foreground" />
-                <span>{customer.phone}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Building className="h-4 w-4 text-muted-foreground" />
-                <span>{customer.company}</span>
-              </div>
-               <Separator className="my-4" />
-               <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <CalendarDays className="h-4 w-4" />
-                <span>عميل منذ {new Date(customer.addedDate).toLocaleDateString()}</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="md:col-span-2 flex flex-col gap-6">
+        <div className="md:col-span-3 flex flex-col gap-6">
           <Card>
             <CardHeader>
               <CardTitle>إضافة اهتمام جديد</CardTitle>

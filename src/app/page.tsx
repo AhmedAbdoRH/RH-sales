@@ -7,9 +7,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { KnowledgeBaseCard } from '@/components/knowledge-base-card';
 
 export default async function DashboardPage() {
@@ -54,10 +53,6 @@ export default async function DashboardPage() {
                     <Link href={`/customers/${customer.id}`}>
                         <Card className="hover:border-primary transition-colors h-full">
                         <CardContent className="flex flex-col items-center justify-center p-6 text-center">
-                            <Avatar className="h-16 w-16 mb-4">
-                            <AvatarImage src={customer.avatarUrl} alt={customer.name} />
-                            <AvatarFallback>{customer.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-                            </Avatar>
                             <p className="font-semibold">{customer.name}</p>
                             <p className="text-sm text-muted-foreground">{customer.company}</p>
                         </CardContent>

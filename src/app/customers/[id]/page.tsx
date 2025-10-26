@@ -1,6 +1,5 @@
 import { getCustomerById } from '@/lib/data';
 import { notFound } from 'next/navigation';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { AddConcernForm } from '@/components/add-concern-form';
 
@@ -14,15 +13,9 @@ export default async function CustomerProfilePage({ params }: { params: { id: st
   return (
     <>
       <div className="mb-6 flex items-start justify-between">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16 border">
-            <AvatarImage src={customer.avatarUrl} alt={customer.name} />
-            <AvatarFallback>{customer.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-          </Avatar>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">{customer.name}</h1>
-            <p className="text-muted-foreground">{customer.company}</p>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{customer.name}</h1>
+          <p className="text-muted-foreground">{customer.company}</p>
         </div>
       </div>
       <div className="grid gap-6 md:grid-cols-2">

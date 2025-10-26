@@ -17,7 +17,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, PlusCircle } from 'lucide-react';
 import {
@@ -127,13 +126,7 @@ export function CustomerList({ customers }: { customers: Customer[] }) {
               {customers.map((customer) => (
                 <TableRow key={customer.id} className="cursor-pointer" onClick={() => router.push(`/customers/${customer.id}`)}>
                   <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={customer.avatarUrl} alt={customer.name} />
-                        <AvatarFallback>{customer.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                      <div className="font-medium">{customer.name}</div>
-                    </div>
+                    <div className="font-medium">{customer.name}</div>
                   </TableCell>
                   <TableCell>{customer.company}</TableCell>
                   <TableCell className="hidden text-muted-foreground md:table-cell">

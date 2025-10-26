@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { ConcernChart } from '@/components/concern-chart';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 
 type ConcernStats = {
@@ -73,10 +72,6 @@ export function ConcernDashboard({ concerns, customers }: { concerns: Concern[],
                   <TableRow key={concern.id}>
                     <TableCell>
                       <Link href={`/customers/${customer?.id}`} className="flex items-center gap-2 font-medium hover:underline">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={customer?.avatarUrl} alt={customer?.name} />
-                          <AvatarFallback>{customer?.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
                         <span>{customer?.name}</span>
                       </Link>
                     </TableCell>

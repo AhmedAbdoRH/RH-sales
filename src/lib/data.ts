@@ -1,13 +1,12 @@
 import type { Customer, Concern, KnowledgeBaseArticle } from './types';
-import { PlaceHolderImages } from './placeholder-images';
 
 const customers: Customer[] = [
-  { id: '1', name: 'Sarah Johnson', email: 'sarah.j@example.com', company: 'Innovate Inc.', phone: '555-0101', avatarUrl: PlaceHolderImages.find(p => p.id === 'avatar1')?.imageUrl ?? '', addedDate: '2023-10-26' },
-  { id: '2', name: 'Michael Chen', email: 'm.chen@example.com', company: 'Solutions Co.', phone: '555-0102', avatarUrl: PlaceHolderImages.find(p => p.id === 'avatar2')?.imageUrl ?? '', addedDate: '2023-11-15' },
-  { id: '3', name: 'Emily Rodriguez', email: 'emily.r@example.com', company: 'Dynamic Corp.', phone: '555-0103', avatarUrl: PlaceHolderImages.find(p => p.id === 'avatar3')?.imageUrl ?? '', addedDate: '2024-01-20' },
-  { id: '4', name: 'David Lee', email: 'david.lee@example.com', company: 'FutureTek', phone: '555-0104', avatarUrl: PlaceHolderImages.find(p => p.id === 'avatar4')?.imageUrl ?? '', addedDate: '2024-02-10' },
-  { id: '5', name: 'Jessica Williams', email: 'j.williams@example.com', company: 'Enterprise LLC', phone: '555-0105', avatarUrl: PlaceHolderImages.find(p => p.id === 'avatar5')?.imageUrl ?? '', addedDate: '2024-03-01' },
-  { id: '6', name: 'Chris Brown', email: 'chris.b@example.com', company: 'Synergy Group', phone: '555-0106', avatarUrl: PlaceHolderImages.find(p => p.id === 'avatar6')?.imageUrl ?? '', addedDate: '2024-04-05' },
+  { id: '1', name: 'Sarah Johnson', email: 'sarah.j@example.com', company: 'Innovate Inc.', phone: '555-0101', addedDate: '2023-10-26' },
+  { id: '2', name: 'Michael Chen', email: 'm.chen@example.com', company: 'Solutions Co.', phone: '555-0102', addedDate: '2023-11-15' },
+  { id: '3', name: 'Emily Rodriguez', email: 'emily.r@example.com', company: 'Dynamic Corp.', phone: '555-0103', addedDate: '2024-01-20' },
+  { id: '4', name: 'David Lee', email: 'david.lee@example.com', company: 'FutureTek', phone: '555-0104', addedDate: '2024-02-10' },
+  { id: '5', name: 'Jessica Williams', email: 'j.williams@example.com', company: 'Enterprise LLC', phone: '555-0105', addedDate: '2024-03-01' },
+  { id: '6', name: 'Chris Brown', email: 'chris.b@example.com', company: 'Synergy Group', phone: '555-0106', addedDate: '2024-04-05' },
 ];
 
 const concerns: Concern[] = [

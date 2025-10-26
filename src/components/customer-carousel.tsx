@@ -13,12 +13,6 @@ import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebas
 import { collection, limit, query } from 'firebase/firestore';
 import { Skeleton } from './ui/skeleton';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -27,7 +21,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Phone } from 'lucide-react';
+import { Phone, Trash2, Pencil } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { deleteCustomer, updateCustomer } from '@/lib/data';
 import { useState } from 'react';
@@ -117,23 +111,21 @@ export function CustomerCarousel() {
               <div className="p-1 h-full">
                   <Card className="hover:border-primary transition-colors h-full flex flex-col">
                     <CardHeader className="flex flex-row items-start justify-between">
-                       <div onClick={(e) => handleEditClick(e, customer)} className="cursor-pointer space-y-1">
+                       <div className="space-y-1">
                           <CardTitle className="text-base">{customer.name}</CardTitle>
                        </div>
-                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost" onClick={(e) => e.stopPropagation()}>
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">فتح القائمة</span>
+                       <div className="flex items-center gap-1">
+                          <Button variant="ghost" size="icon" onClick={(e) => handleEditClick(e, customer)}>
+                            <Pencil className="h-4 w-4" />
+                            <span className="sr-only">تعديل</span>
                           </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onSelect={(e) => handleEditClick(e, customer)}>تعديل</DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive" onSelect={(e) => handleDeleteClick(e, customer.id)}>حذف</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={(e) => handleDeleteClick(e, customer.id)}>
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">حذف</span>
+                          </Button>
+                       </div>
                     </CardHeader>
-                    <CardContent className="flex-grow space-y-3 cursor-pointer p-6 pt-0" onClick={(e) => handleEditClick(e, customer)}>
+                    <CardContent className="flex-grow space-y-3 p-6 pt-0">
                       {customer.generalInfo && (
                         <div>
                           <h4 className="text-sm font-semibold mb-1">معلومات عامة</h4>

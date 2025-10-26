@@ -36,20 +36,22 @@ export async function summarizeCustomerConcerns(
   return summarizeCustomerConcernsFlow(input);
 }
 
-const summarizeConcernTool = ai.defineTool({
-  name: 'summarizeConcern',
-  description: 'Summarizes a customer concern into a concise statement.',
-  inputSchema: z.object({
-    concern: z.string().describe('The customer concern to summarize.'),
-  }),
-  outputSchema: z.string(),
-  async (input) => {
+const summarizeConcernTool = ai.defineTool(
+  {
+    name: 'summarizeConcern',
+    description: 'Summarizes a customer concern into a concise statement.',
+    inputSchema: z.object({
+      concern: z.string().describe('The customer concern to summarize.'),
+    }),
+    outputSchema: z.string(),
+  },
+  async input => {
     const {text} = await ai.generate({
       prompt: `Summarize the following customer concern: ${input.concern}`,
     });
     return text;
-  },
-});
+  }
+);
 
 const prompt = ai.definePrompt({
   name: 'summarizeCustomerConcernsPrompt',

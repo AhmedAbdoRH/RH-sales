@@ -1,6 +1,6 @@
 'use client';
 
-import type { Customer } from './types';
+import type { Customer, KnowledgeBaseArticle, Skill } from './types';
 import {
   collection,
   Timestamp,
@@ -28,4 +28,14 @@ export const addConcern = (firestore: Firestore, customerId: string, concernText
         customerId: customerId,
     };
     addDocumentNonBlocking(concernsCollection, newConcern);
+};
+
+export const addKnowledgeBaseArticle = (firestore: Firestore, article: Omit<KnowledgeBaseArticle, 'id'>) => {
+  const articleCollection = collection(firestore, 'knowledge_base_articles');
+  addDocumentNonBlocking(articleCollection, article);
+};
+
+export const addSkill = (firestore: Firestore, skill: Omit<Skill, 'id'>) => {
+  const skillCollection = collection(firestore, 'skills');
+  addDocumentNonBlocking(skillCollection, skill);
 };

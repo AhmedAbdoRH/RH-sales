@@ -1,4 +1,25 @@
+'use client';
+
 import type { Customer, Concern, KnowledgeBaseArticle } from './types';
+import {
+  collection,
+  getDocs,
+  getDoc,
+  doc,
+  query,
+  where,
+  addDoc,
+  Timestamp,
+} from 'firebase/firestore';
+import { type Firestore } from 'firebase/firestore';
+import { addDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+
+// This file will now primarily contain functions to interact with Firestore.
+// The mock data is no longer needed.
+
+// NOTE: We are keeping the old functions that return mock data
+// so that other parts of the app that haven't been migrated yet
+// don't break.
 
 const customers: Customer[] = [
   { id: '1', name: 'Sarah Johnson', email: 'sarah.j@example.com', company: 'Innovate Inc.', phone: '555-0101', addedDate: '2023-10-26' },
@@ -28,7 +49,32 @@ const knowledgeBaseArticles: KnowledgeBaseArticle[] = [
     { id: 'kb5', title: "Upselling to the Enterprise Plan", category: "Sales Techniques", content: "Identify customers who are hitting usage limits or requesting features only available in the Enterprise plan. Frame the upgrade as a solution to their growing needs and a way to unlock more value.", tags: ["upselling", "enterprise", "growth"] },
 ];
 
-// Simulate API calls
+// New Firestore-based functions
+
+export const addCustomer = (firestore: Firestore, customer: Omit<Customer, 'id' | 'addedDate'>) => {
+  const customerCollection = collection(firestore, 'customers');
+  const newCustomer = {
+    ...customer,
+    addedDate: Timestamp.now(),
+  }
+  addDocumentNonBlocking(customerCollection, newCustomer);
+};
+
+export const addConcern = (firestore: Firestore, customerId: string, concernText: string, summary: string, category: string) => {
+    const concernsCollection = collection(firestore, 'customers', customerId, 'concerns');
+    const newConcern = {
+        date: Timestamp.now(),
+        originalText: concernText,
+        summary: summary,
+        category: category,
+        status: 'analyzed',
+        customerId: customerId,
+    };
+    addDocumentNonBlocking(concernsCollection, newConcern);
+};
+
+
+// Old mock data functions (to be deprecated)
 export const getCustomers = async (): Promise<Customer[]> => {
   return new Promise(resolve => setTimeout(() => resolve(customers), 50));
 };

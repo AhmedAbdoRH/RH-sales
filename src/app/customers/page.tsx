@@ -1,10 +1,6 @@
-import { getCustomers } from '@/lib/data';
 import { CustomerList } from '@/components/customer-list';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
 
 export default async function CustomersPage() {
-  const customers = await getCustomers();
   
   return (
     <div className="space-y-6">
@@ -14,7 +10,7 @@ export default async function CustomersPage() {
             <p className="text-muted-foreground">إدارة قاعدة بيانات العملاء وعرض ملفاتهم الشخصية.</p>
         </div>
       </div>
-      <CustomerList customers={customers} />
+      <CustomerList />
     </div>
   );
 }

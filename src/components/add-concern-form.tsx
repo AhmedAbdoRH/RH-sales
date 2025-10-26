@@ -1,22 +1,32 @@
 "use client";
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useFormState } from 'react-dom';
+import { getConcernSummary } from '@/lib/actions';
+import { useFirestore } from '@/firebase';
+import { addConcern } from '@/lib/data';
+
+const initialState: { message: string, summary?: string, category?: string, success: boolean } = {
+  message: '',
+  success: false,
+};
 
 export function AddConcernForm({ customerId, title }: { customerId: string, title: string }) {
   const { toast } = useToast();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const [formState, formAction] = useFormState(getConcernSummary, initialState);
+  const [concernText, setConcernText] = useState('');
+  const firestore = useFirestore();
 
-  const handleSaveConcern = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const concernText = formData.get('concern') as string;
 
     if (!concernText) {
         toast({
@@ -27,24 +37,38 @@ export function AddConcernForm({ customerId, title }: { customerId: string, titl
         return;
     }
 
-    // In a real app, this would save the concern to the database.
-    console.log(`Saving ${title}:`, {
-      customerId,
-      originalText: concernText,
-    });
+    if (!firestore) {
+        toast({
+            title: "خطأ في الاتصال",
+            description: "لا يمكن الاتصال بقاعدة البيانات.",
+            variant: "destructive",
+        });
+        return;
+    }
 
-    toast({
-      title: `تم حفظ ${title}`,
-      description: `تمت إضافة ${title} الجديد إلى ملف تعريف العميل.`,
-    });
+    const formData = new FormData(event.currentTarget);
+    const result = await getConcernSummary(initialState, formData);
 
-    formRef.current?.reset();
-    // Refresh the page to show the new concern in the history list (if any).
-    router.refresh(); 
+    if (result.success && result.summary && result.category) {
+        addConcern(firestore, customerId, concernText, result.summary, result.category);
+        toast({
+          title: `تم حفظ ${title}`,
+          description: `تمت إضافة ${title} الجديد إلى ملف تعريف العميل.`,
+        });
+        formRef.current?.reset();
+        setConcernText('');
+        router.refresh(); 
+    } else {
+        toast({
+            title: "فشل الحفظ",
+            description: result.message,
+            variant: "destructive",
+        });
+    }
   };
 
   return (
-    <form ref={formRef} onSubmit={handleSaveConcern} className="space-y-4">
+    <form ref={formRef} onSubmit={handleFormSubmit} className="space-y-4">
       <div>
         <Label htmlFor="concern">سجل {title} جديد</Label>
         <Textarea
@@ -53,6 +77,8 @@ export function AddConcernForm({ customerId, title }: { customerId: string, titl
           placeholder=""
           rows={2}
           required
+          value={concernText}
+          onChange={(e) => setConcernText(e.target.value)}
         />
       </div>
        <Button type="submit" className="w-full justify-center">

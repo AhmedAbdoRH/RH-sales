@@ -1,7 +1,7 @@
 "use client";
 
 import type { Customer } from '@/lib/types';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Table,
@@ -32,36 +32,55 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import { addCustomer } from '@/lib/data';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export function CustomerList({ customers }: { customers: Customer[] }) {
+export function CustomerList() {
   const router = useRouter();
   const { toast } = useToast();
   const [openAddDialog, setOpenAddDialog] = useState(false);
+  const firestore = useFirestore();
 
-  // Mock function to add a customer
+  const customersQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return collection(firestore, 'customers');
+  }, [firestore]);
+
+  const { data: customers, isLoading } = useCollection<Omit<Customer, 'id'>>(customersQuery);
+
   const handleAddCustomer = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const newCustomer = {
-      name: formData.get('name'),
-      email: formData.get('email'),
-    };
     
-    console.log("Adding new customer:", newCustomer);
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const company = formData.get('company') as string;
+    const phone = formData.get('phone') as string;
+
+    if (!firestore || !name || !email) {
+        toast({
+            title: "خطأ",
+            description: "الاسم والبريد الإلكتروني مطلوبان.",
+            variant: "destructive"
+        });
+        return;
+    }
+    
+    const newCustomer = { name, email, company, phone };
+    addCustomer(firestore, newCustomer);
+    
     setOpenAddDialog(false);
     
     toast({
       title: "تمت إضافة العميل",
       description: `تمت إضافة ${newCustomer.name} إلى قاعدة بياناتك.`,
     });
-    
-    router.refresh(); 
   };
 
   const handleEditClick = (e: React.MouseEvent, customerId: string) => {
     e.stopPropagation();
-    // In a real app, you would navigate to an edit page
-    // or open a modal with the customer's data.
     toast({
       title: "ميزة التعديل",
       description: `سيتم فتح نموذج لتعديل العميل ${customerId}.`,
@@ -70,14 +89,20 @@ export function CustomerList({ customers }: { customers: Customer[] }) {
 
   const handleDeleteClick = (e: React.MouseEvent, customerId: string) => {
     e.stopPropagation();
-    // In a real app, you would show a confirmation dialog
-    // before deleting the customer.
     toast({
       title: "ميزة الحذف",
       description: `سيتم حذف العميل ${customerId}.`,
       variant: "destructive",
     });
   };
+  
+  const formatDate = (timestamp: any) => {
+    if (timestamp && typeof timestamp.toDate === 'function') {
+      return timestamp.toDate().toLocaleDateString();
+    }
+    return 'التاريخ غير متوفر';
+  }
+
 
   return (
     <>
@@ -144,14 +169,27 @@ export function CustomerList({ customers }: { customers: Customer[] }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {customers.map((customer) => (
+              {isLoading && (
+                <>
+                  <TableRow>
+                    <TableCell colSpan={4}><Skeleton className="h-8 w-full" /></TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={4}><Skeleton className="h-8 w-full" /></TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={4}><Skeleton className="h-8 w-full" /></TableCell>
+                  </TableRow>
+                </>
+              )}
+              {!isLoading && customers?.map((customer) => (
                 <TableRow key={customer.id} className="cursor-pointer" onClick={() => router.push(`/customers/${customer.id}`)}>
                   <TableCell>
                     <div className="font-medium">{customer.name}</div>
                   </TableCell>
                   <TableCell>{customer.company}</TableCell>
                   <TableCell className="hidden text-muted-foreground md:table-cell">
-                    {new Date(customer.addedDate).toLocaleDateString()}
+                    {formatDate(customer.addedDate)}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>

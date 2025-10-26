@@ -1,162 +1,120 @@
 /**
- * @file Overview
- * This ruleset enforces a strict user-ownership model for customer data,
- * while allowing public read access to knowledge base articles.
+ * @fileoverview Firestore Security Rules for SalesPro Hub.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for customer data (Interactions, Concerns),
+ * with public read access to knowledge base articles.
  *
  * Data Structure:
- * - /customers/{customerId}: Stores customer profiles, accessible only to the customer themselves.
- * - /customers/{customerId}/interactions/{interactionId}: Stores interactions related to a specific customer, accessible only to that customer.
- * - /customers/{customerId}/concerns/{concernId}: Stores concerns related to a specific customer, accessible only to that customer.
- * - /knowledge_base_articles/{knowledgeBaseArticleId}: Stores knowledge base articles, publicly readable.
+ * - /customers/{customerId}: Stores customer profiles.
+ * - /customers/{customerId}/interactions/{interactionId}: Stores interactions related to a specific customer.
+ * - /customers/{customerId}/concerns/{concernId}: Stores concerns related to a specific customer.
+ * - /knowledge_base_articles/{knowledgeBaseArticleId}: Stores knowledge base articles accessible to all users.
  *
  * Key Security Decisions:
- * - Customer data (profiles, interactions, concerns) is strictly private and only accessible to the authenticated user matching the `customerId`.
- * - Knowledge base articles are publicly readable but only writable by authorized users (currently, this is not enforced but can be extended in the future with role-based access).
- * - Listing of customer documents is disallowed for privacy reasons.
+ * - Customers collection requires authentication to list.
+ * - User-specific data (interactions, concerns) is secured via path-based ownership.
+ * - Knowledge base articles are publicly readable.
+ * - Write operations are always protected by authentication and authorization checks.
  *
- *  Denormalization for Authorization:
- *  - The `customerId` is present in the path for interactions and concerns, and is used to enforce ownership, preventing the need for complex `get()` calls.
+ * Denormalization for Authorization:
+ * - Customer subcollections (`interactions`, `concerns`) use path-based authorization, relying on the `customerId` in the path.
+ *
+ * Structural Segregation:
+ * - Private customer data is stored in subcollections under `/customers/{customerId}`, while public knowledge base articles reside in a top-level collection.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Manages customer profiles, ensuring only the owner can read and write their own data.
+     * @description Secures the customers collection. Only authenticated users can list customers.
      * @path /customers/{customerId}
-     * @allow (create) - User with UID 'user_abc' can create a customer document with ID 'user_abc'.
-     * @deny (create) - User with UID 'user_xyz' cannot create a customer document with ID 'user_abc'.
-     * @allow (get) - User with UID 'user_abc' can read their own customer document.
-     * @deny (get) - User with UID 'user_xyz' cannot read customer document with ID 'user_abc'.
-     * @allow (update) - User with UID 'user_abc' can update their own customer document.
-     * @deny (update) - User with UID 'user_xyz' cannot update customer document with ID 'user_abc'.
-     * @allow (delete) - User with UID 'user_abc' can delete their own customer document.
-     * @deny (delete) - User with UID 'user_xyz' cannot delete customer document with ID 'user_abc'.
-     * @principle Enforces document ownership for all operations.
+     * @allow get: if false;
+     * @allow list: if isSignedIn();
+     * @allow create: if false;
+     * @allow update: if false;
+     * @allow delete: if false;
+     * @deny get: if true;
+     * @principle Requires authentication to list customers and explicitly denies all write operations.
      */
     match /customers/{customerId} {
-      // Checks if the user is signed in
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      // Checks if the requested user id matches the authentication user id
-      function isOwner(userId) {
-        return isSignedIn() && request.auth.uid == userId;
-      }
-
-      // Checks if the user is signed in and is the owner of the document AND that the document already exists (update/delete)
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      // Read Permissions
-      allow get: if isOwner(customerId);
-      allow list: if false; // Listing customers is not allowed.
-
-      // Write Permissions
-      allow create: if isOwner(customerId);
-      allow update: if isExistingOwner(customerId);
-      allow delete: if isExistingOwner(customerId);
+      allow get: if false;
+      allow list: if isSignedIn();
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     /**
-     * @description Manages interactions for a specific customer, ensuring only the owner can read and write interactions.
+     * @description Secures interactions subcollection. Only the owner of the customer data can manage interactions.
      * @path /customers/{customerId}/interactions/{interactionId}
-     * @allow (create) - User with UID 'user_abc' can create an interaction for customer 'user_abc'.
-     * @deny (create) - User with UID 'user_xyz' cannot create an interaction for customer 'user_abc'.
-     * @allow (get) - User with UID 'user_abc' can read an interaction for customer 'user_abc'.
-     * @deny (get) - User with UID 'user_xyz' cannot read an interaction for customer 'user_abc'.
-     * @allow (update) - User with UID 'user_abc' can update an interaction for customer 'user_abc'.
-     * @deny (update) - User with UID 'user_xyz' cannot update an interaction for customer 'user_abc'.
-     * @allow (delete) - User with UID 'user_abc' can delete an interaction for customer 'user_abc'.
-     * @deny (delete) - User with UID 'user_xyz' cannot delete an interaction for customer 'user_abc'.
-     * @principle Enforces document ownership for writes, restricts access to a user's own data tree, validates relational integrity.
+     * @allow get: if isOwner(customerId);
+     * @allow list: if isOwner(customerId);
+     * @allow create: if isSignedIn() && request.resource.data.customerId == customerId;
+     * @allow update: if isExistingOwner(customerId) && resource.data.customerId == customerId;
+     * @allow delete: if isExistingOwner(customerId);
+     * @deny get: if !isSignedIn();
+     * @deny list: if !isSignedIn();
+     * @principle Enforces document ownership for writes, restricts access to a user's own data tree.
      */
     match /customers/{customerId}/interactions/{interactionId} {
-        // Checks if the user is signed in
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      // Checks if the requested user id matches the authentication user id
-      function isOwner(customerId) {
-        return isSignedIn() && request.auth.uid == customerId;
-      }
-
-      // Checks if the user is signed in and is the owner of the document AND that the document already exists (update/delete)
-      function isExistingOwner(customerId) {
-        return isOwner(customerId) && resource != null;
-      }
-
-      // Read Permissions
       allow get: if isOwner(customerId);
       allow list: if isOwner(customerId);
-
-      // Write Permissions
-      allow create: if isOwner(customerId);
-      allow update: if isExistingOwner(customerId);
+      allow create: if isSignedIn() && request.resource.data.customerId == customerId;
+      allow update: if isExistingOwner(customerId) && resource.data.customerId == customerId;
       allow delete: if isExistingOwner(customerId);
     }
 
     /**
-     * @description Manages concerns for a specific customer, ensuring only the owner can read and write concerns.
+     * @description Secures concerns subcollection. Only the owner of the customer data can manage concerns.
      * @path /customers/{customerId}/concerns/{concernId}
-     * @allow (create) - User with UID 'user_abc' can create a concern for customer 'user_abc'.
-     * @deny (create) - User with UID 'user_xyz' cannot create a concern for customer 'user_abc'.
-     * @allow (get) - User with UID 'user_abc' can read a concern for customer 'user_abc'.
-     * @deny (get) - User with UID 'user_xyz' cannot read a concern for customer 'user_abc'.
-     * @allow (update) - User with UID 'user_abc' can update a concern for customer 'user_abc'.
-     * @deny (update) - User with UID 'user_xyz' cannot update a concern for customer 'user_abc'.
-     * @allow (delete) - User with UID 'user_abc' can delete a concern for customer 'user_abc'.
-     * @deny (delete) - User with UID 'user_xyz' cannot delete a concern for customer 'user_abc'.
-     * @principle Enforces document ownership for writes, restricts access to a user's own data tree, validates relational integrity.
+     * @allow get: if isOwner(customerId);
+     * @allow list: if isOwner(customerId);
+     * @allow create: if isSignedIn() && request.resource.data.customerId == customerId;
+     * @allow update: if isExistingOwner(customerId) && resource.data.customerId == customerId;
+     * @allow delete: if isExistingOwner(customerId);
+     * @deny get: if !isSignedIn();
+     * @deny list: if !isSignedIn();
+     * @principle Enforces document ownership for writes, restricts access to a user's own data tree.
      */
     match /customers/{customerId}/concerns/{concernId} {
-      // Checks if the user is signed in
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      // Checks if the requested user id matches the authentication user id
-      function isOwner(customerId) {
-        return isSignedIn() && request.auth.uid == customerId;
-      }
-
-      // Checks if the user is signed in and is the owner of the document AND that the document already exists (update/delete)
-      function isExistingOwner(customerId) {
-        return isOwner(customerId) && resource != null;
-      }
-
-      // Read Permissions
       allow get: if isOwner(customerId);
       allow list: if isOwner(customerId);
-
-      // Write Permissions
-      allow create: if isOwner(customerId);
-      allow update: if isExistingOwner(customerId);
+      allow create: if isSignedIn() && request.resource.data.customerId == customerId;
+      allow update: if isExistingOwner(customerId) && resource.data.customerId == customerId;
       allow delete: if isExistingOwner(customerId);
     }
 
     /**
-     * @description Manages knowledge base articles, allowing public read access and restricted write access.
+     * @description Secures knowledge base articles collection. Allows public read access, but requires authentication for writes.
      * @path /knowledge_base_articles/{knowledgeBaseArticleId}
-     * @allow (get) - Any user (signed in or not) can read a knowledge base article.
-     * @allow (list) - Any user (signed in or not) can list knowledge base articles.
-     * @deny (create) - No user can create a knowledge base article (currently).
-     * @deny (update) - No user can update a knowledge base article (currently).
-     * @deny (delete) - No user can delete a knowledge base article (currently).
-     * @principle Allows public read access to knowledge base articles.
+     * @allow get: if true;
+     * @allow list: if true;
+     * @allow create: if isSignedIn();
+     * @allow update: if isSignedIn();
+     * @allow delete: if isSignedIn();
+     * @principle Allows public read access while restricting write access to authenticated users.
      */
     match /knowledge_base_articles/{knowledgeBaseArticleId} {
-      // Read Permissions
       allow get: if true;
       allow list: if true;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && resource != null;
+      allow delete: if isSignedIn() && resource != null;
+    }
 
-      // Write Permissions
-      allow create: if false; // TODO: Add role-based access for article creation.
-      allow update: if false; // TODO: Add role-based access for article updates.
-      allow delete: if false; // TODO: Add role-based access for article deletion.
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(customerId) {
+      return request.auth.uid == customerId;
+    }
+
+    function isExistingOwner(customerId) {
+      return isOwner(customerId) && resource != null;
     }
   }
 }

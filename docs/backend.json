@@ -34,6 +34,14 @@
         "generalInfo": {
           "type": "string",
           "description": "General information about the customer."
+        },
+        "needs": {
+          "type": "string",
+          "description": "The needs of the customer."
+        },
+        "customerConcerns": {
+          "type": "string",
+          "description": "The concerns of the customer."
         }
       },
       "required": [

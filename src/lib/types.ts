@@ -6,6 +6,8 @@ export type Customer = {
   phone?: string;
   avatarUrl?: string;
   generalInfo?: string;
+  needs?: string;
+  customerConcerns?: string;
   addedDate: any; // Can be a string or a Firestore Timestamp
 };
 

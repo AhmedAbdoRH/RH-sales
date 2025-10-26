@@ -9,9 +9,9 @@ import { doc } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function CustomerProfilePage({ params }: { params: { id: string } }) {
+  const customerId = params.id;
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
-  const customerId = params.id;
   
   const customerRef = useMemoFirebase(() => {
     if (!firestore || !user) return null;
@@ -28,6 +28,7 @@ export default function CustomerProfilePage({ params }: { params: { id: string }
               <Skeleton className="h-6 w-1/4 mt-2" />
             </div>
             <div className="grid gap-6 md:grid-cols-2">
+                <Skeleton className="h-48 w-full" />
                 <Skeleton className="h-48 w-full" />
                 <Skeleton className="h-48 w-full" />
             </div>
@@ -47,23 +48,32 @@ export default function CustomerProfilePage({ params }: { params: { id: string }
           <p className="text-muted-foreground">{customer.company}</p>
         </div>
       </div>
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle>الاهتمامات</CardTitle>
-            <CardDescription>سجل اهتمام جديد للعميل.</CardDescription>
+            <CardTitle>الاحتياجات</CardTitle>
+            <CardDescription>احتياجات العميل المسجلة.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">{customer.needs || 'لم تسجل احتياجات.'}</p>
+          </CardContent>
+        </Card>
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle>المخاوف</CardTitle>
+            <CardDescription>مخاوف العميل المسجلة.</CardDescription>
+          </CardHeader>
+          <CardContent>
+             <p className="text-sm text-muted-foreground">{customer.customerConcerns || 'لم تسجل مخاوف.'}</p>
+          </CardContent>
+        </Card>
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle>تسجيل اهتمام جديد</CardTitle>
+            <CardDescription>سجل اهتمامًا أو سؤالًا جديدًا لهذا العميل ليتم تحليله.</CardDescription>
           </CardHeader>
           <CardContent>
             <AddConcernForm customerId={customerId} title="الاهتمام" />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>المخاوف</CardTitle>
-            <CardDescription>سجل مخاوف جديدة للعميل.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <AddConcernForm customerId={customerId} title="المخاوف" />
           </CardContent>
         </Card>
       </div>

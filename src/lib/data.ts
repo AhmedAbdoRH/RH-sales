@@ -20,6 +20,8 @@ export const addCustomer = (firestore: Firestore, customer: Partial<Omit<Custome
     company: customer.company || '',
     phone: customer.phone || '',
     generalInfo: customer.generalInfo || '',
+    needs: customer.needs || '',
+    customerConcerns: customer.customerConcerns || '',
     addedDate: Timestamp.now(),
   }
   addDocumentNonBlocking(customerCollection, newCustomer);

@@ -36,7 +36,7 @@ export default async function CustomerProfilePage({ params }: { params: { id: st
         <div className="md:col-span-1 flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Contact Information</CardTitle>
+              <CardTitle>معلومات الاتصال</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="flex items-center gap-3">
@@ -54,7 +54,7 @@ export default async function CustomerProfilePage({ params }: { params: { id: st
                <Separator className="my-4" />
                <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <CalendarDays className="h-4 w-4" />
-                <span>Customer since {new Date(customer.addedDate).toLocaleDateString()}</span>
+                <span>عميل منذ {new Date(customer.addedDate).toLocaleDateString()}</span>
               </div>
             </CardContent>
           </Card>
@@ -63,8 +63,8 @@ export default async function CustomerProfilePage({ params }: { params: { id: st
         <div className="md:col-span-2 flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Add New Concern</CardTitle>
-              <CardDescription>Log a new customer concern and use AI to analyze it.</CardDescription>
+              <CardTitle>إضافة اهتمام جديد</CardTitle>
+              <CardDescription>سجل اهتمام عميل جديد وقم بتحليله باستخدام الذكاء الاصطناعي.</CardDescription>
             </CardHeader>
             <CardContent>
               <AddConcernForm customerId={customer.id} />
@@ -73,7 +73,7 @@ export default async function CustomerProfilePage({ params }: { params: { id: st
 
           <Card>
             <CardHeader>
-              <CardTitle>Concern History</CardTitle>
+              <CardTitle>سجل الاهتمامات</CardTitle>
             </CardHeader>
             <CardContent>
               {sortedConcerns.length > 0 ? (
@@ -93,7 +93,7 @@ export default async function CustomerProfilePage({ params }: { params: { id: st
                 </ul>
               ) : (
                 <div className="py-8 text-center text-sm text-muted-foreground">
-                  <p>No concerns logged for this customer yet.</p>
+                  <p>لم يتم تسجيل أي اهتمامات لهذا العميل بعد.</p>
                 </div>
               )}
             </CardContent>

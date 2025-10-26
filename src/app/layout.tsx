@@ -7,8 +7,8 @@ import { Toaster } from '@/components/ui/toaster';
 import { SkillReminder } from '@/components/skill-reminder';
 
 export const metadata: Metadata = {
-  title: 'SalesPro Hub',
-  description: 'Your personal sales assistant dashboard.',
+  title: 'مركز محترفي المبيعات',
+  description: 'لوحة التحكم الخاصة بمساعد المبيعات الشخصي.',
 };
 
 export default function RootLayout({
@@ -17,16 +17,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ar" dir="rtl">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className={cn('min-h-screen bg-background font-body antialiased')}>
+      <body className={cn('min-h-screen bg-background font-body antialiased', 'dark')}>
         <div className="flex w-full flex-col">
           <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
             <div className="flex items-center gap-2">
@@ -50,7 +50,7 @@ export default function RootLayout({
                 />
               </svg>
               <h2 className="text-lg font-semibold text-foreground tracking-tight">
-                SalesPro Hub
+                مركز محترفي المبيعات
               </h2>
             </div>
             <div className="flex-1">
@@ -59,11 +59,11 @@ export default function RootLayout({
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="icon" className="rounded-full">
                 <Settings className="h-5 w-5" />
-                <span className="sr-only">Settings</span>
+                <span className="sr-only">الإعدادات</span>
               </Button>
               <Button variant="ghost" size="icon" className="rounded-full">
                 <UserCircle className="h-5 w-5" />
-                <span className="sr-only">Profile</span>
+                <span className="sr-only">الملف الشخصي</span>
               </Button>
             </div>
           </header>

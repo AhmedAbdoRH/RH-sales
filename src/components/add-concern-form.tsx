@@ -21,7 +21,7 @@ function AnalyzeButton() {
   return (
     <Button type="submit" disabled={pending}>
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-      Analyze with AI
+      تحليل بالذكاء الاصطناعي
     </Button>
   );
 }
@@ -35,7 +35,7 @@ export function AddConcernForm({ customerId }: { customerId: string }) {
   useEffect(() => {
     if (state.message && !state.success) {
       toast({
-        title: "Analysis Failed",
+        title: "فشل التحليل",
         description: state.message,
         variant: "destructive",
       });
@@ -47,8 +47,8 @@ export function AddConcernForm({ customerId }: { customerId: string }) {
     
     if (!state.summary || !state.category) {
         toast({
-            title: "Cannot Save",
-            description: "Please analyze a concern with AI first.",
+            title: "لا يمكن الحفظ",
+            description: "يرجى تحليل الاهتمام باستخدام الذكاء الاصطناعي أولاً.",
             variant: "destructive",
         });
         return;
@@ -63,8 +63,8 @@ export function AddConcernForm({ customerId }: { customerId: string }) {
     });
 
     toast({
-      title: "Concern Saved",
-      description: "The new concern has been added to the customer's profile.",
+      title: "تم حفظ الاهتمام",
+      description: "تمت إضافة الاهتمام الجديد إلى ملف تعريف العميل.",
     });
 
     formRef.current?.reset();
@@ -75,11 +75,11 @@ export function AddConcernForm({ customerId }: { customerId: string }) {
   return (
     <form ref={formRef} action={formAction} className="space-y-4">
       <div>
-        <Label htmlFor="concern">Customer's Original Concern</Label>
+        <Label htmlFor="concern">الاهتمام الأصلي للعميل</Label>
         <Textarea
           id="concern"
           name="concern"
-          placeholder="e.g., 'The price is too high compared to competitor X...'"
+          placeholder="مثال: 'السعر مرتفع جدًا مقارنة بالمنافس س...'"
           rows={3}
           required
         />
@@ -88,18 +88,18 @@ export function AddConcernForm({ customerId }: { customerId: string }) {
 
       {state.success && (
         <div className="space-y-4 rounded-lg border bg-muted/50 p-4 animate-in fade-in-50">
-          <h4 className="font-semibold">AI Analysis Results</h4>
+          <h4 className="font-semibold">نتائج تحليل الذكاء الاصطناعي</h4>
           <div>
-            <Label htmlFor="summary">Suggested Summary</Label>
+            <Label htmlFor="summary">الملخص المقترح</Label>
             <Input id="summary" name="summary" defaultValue={state.summary} />
           </div>
           <div>
-            <Label htmlFor="category">Suggested Category</Label>
+            <Label htmlFor="category">الفئة المقترحة</Label>
             <Input id="category" name="category" defaultValue={state.category} />
           </div>
           <Button onClick={handleSaveConcern}>
             <Save className="mr-2 h-4 w-4" />
-            Save Concern to Profile
+            حفظ الاهتمام في الملف الشخصي
           </Button>
         </div>
       )}

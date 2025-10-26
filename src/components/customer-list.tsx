@@ -52,8 +52,8 @@ export function CustomerList({ customers }: { customers: Customer[] }) {
     setOpenAddDialog(false);
     
     toast({
-      title: "Customer Added",
-      description: `${newCustomer.name} has been added to your database.`,
+      title: "تمت إضافة العميل",
+      description: `تمت إضافة ${newCustomer.name} إلى قاعدة بياناتك.`,
     });
     
     router.refresh(); 
@@ -65,46 +65,46 @@ export function CustomerList({ customers }: { customers: Customer[] }) {
         <Dialog open={openAddDialog} onOpenChange={setOpenAddDialog}>
           <DialogTrigger asChild>
             <Button>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Add Customer
+              <PlusCircle className="ml-2 h-4 w-4" />
+              إضافة عميل
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <form onSubmit={handleAddCustomer}>
               <DialogHeader>
-                <DialogTitle>Add New Customer</DialogTitle>
+                <DialogTitle>إضافة عميل جديد</DialogTitle>
                 <DialogDescription>
-                  Fill in the details for the new customer profile. Click save when you're done.
+                  املأ تفاصيل ملف العميل الجديد. انقر على "حفظ" عند الانتهاء.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="name" className="text-right">
-                    Name
+                    الاسم
                   </Label>
                   <Input id="name" name="name" className="col-span-3" required />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="email" className="text-right">
-                    Email
+                    البريد الإلكتروني
                   </Label>
                   <Input id="email" name="email" type="email" className="col-span-3" required />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="company" className="text-right">
-                    Company
+                    الشركة
                   </Label>
                   <Input id="company" name="company" className="col-span-3" />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="phone" className="text-right">
-                    Phone
+                    الهاتف
                   </Label>
                   <Input id="phone" name="phone" className="col-span-3" />
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit">Save Customer</Button>
+                <Button type="submit">حفظ العميل</Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -115,11 +115,11 @@ export function CustomerList({ customers }: { customers: Customer[] }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Company</TableHead>
-                <TableHead className="hidden md:table-cell">Joined</TableHead>
+                <TableHead>العميل</TableHead>
+                <TableHead>الشركة</TableHead>
+                <TableHead className="hidden md:table-cell">تاريخ الانضمام</TableHead>
                 <TableHead>
-                  <span className="sr-only">Actions</span>
+                  <span className="sr-only">إجراءات</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -144,13 +144,13 @@ export function CustomerList({ customers }: { customers: Customer[] }) {
                       <DropdownMenuTrigger asChild>
                         <Button aria-haspopup="true" size="icon" variant="ghost" onClick={(e) => e.stopPropagation()}>
                           <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
+                          <span className="sr-only">فتح القائمة</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onSelect={() => router.push(`/customers/${customer.id}`)}>View</DropdownMenuItem>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => router.push(`/customers/${customer.id}`)}>عرض</DropdownMenuItem>
+                        <DropdownMenuItem>تعديل</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive">حذف</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

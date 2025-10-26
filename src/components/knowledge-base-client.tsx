@@ -26,11 +26,11 @@ export function KnowledgeBaseClient({ articles }: { articles: KnowledgeBaseArtic
   return (
     <div className="space-y-6">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search articles, tags, or keywords..."
-          className="w-full max-w-lg pl-10"
+          placeholder="ابحث في المقالات، الوسوم، أو الكلمات المفتاحية..."
+          className="w-full max-w-lg pr-10"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -42,7 +42,7 @@ export function KnowledgeBaseClient({ articles }: { articles: KnowledgeBaseArtic
             {filteredArticles.map(article => (
               <AccordionItem value={article.id} key={article.id}>
                 <AccordionTrigger>
-                    <div className='text-left'>
+                    <div className='text-right'>
                         <p className='font-semibold'>{article.title}</p>
                         <Badge variant="outline" className="mt-1">{article.category}</Badge>
                     </div>
@@ -60,8 +60,8 @@ export function KnowledgeBaseClient({ articles }: { articles: KnowledgeBaseArtic
           </Accordion>
         ) : (
           <div className="py-16 text-center text-muted-foreground">
-            <p>No articles found for "{searchTerm}".</p>
-            <p className="text-sm">Try searching for a different keyword.</p>
+            <p>لم يتم العثور على مقالات لـ "{searchTerm}".</p>
+            <p className="text-sm">حاول البحث بكلمة مفتاحية مختلفة.</p>
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { useDoc, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { AddConcernForm } from '@/components/add-concern-form';
@@ -10,15 +10,16 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export default function CustomerProfilePage({ params }: { params: { id: string } }) {
   const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
   
   const customerRef = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !user) return null;
     return doc(firestore, 'customers', params.id);
-  }, [firestore, params.id]);
+  }, [firestore, params.id, user]);
 
   const { data: customer, isLoading } = useDoc<Omit<Customer, 'id'>>(customerRef);
 
-  if (isLoading) {
+  if (isLoading || isUserLoading) {
     return (
         <>
             <div className="mb-6">

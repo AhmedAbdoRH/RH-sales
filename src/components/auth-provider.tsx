@@ -11,9 +11,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { user, isUserLoading } = useUser();
 
   useEffect(() => {
-    // If the user state is done loading and there's no user,
+    // If auth is ready and the user state is done loading and there's no user,
     // initiate an anonymous sign-in.
-    if (!isUserLoading && !user) {
+    if (auth && !isUserLoading && !user) {
       initiateAnonymousSignIn(auth);
     }
   }, [auth, user, isUserLoading]);

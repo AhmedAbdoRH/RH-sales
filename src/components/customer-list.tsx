@@ -32,7 +32,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import { addCustomer } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -42,11 +42,12 @@ export function CustomerList() {
   const { toast } = useToast();
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
 
   const customersQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !user) return null;
     return collection(firestore, 'customers');
-  }, [firestore]);
+  }, [firestore, user]);
 
   const { data: customers, isLoading } = useCollection<Omit<Customer, 'id'>>(customersQuery);
 
@@ -103,6 +104,7 @@ export function CustomerList() {
     return 'التاريخ غير متوفر';
   }
 
+  const showLoading = isLoading || isUserLoading;
 
   return (
     <>
@@ -169,7 +171,7 @@ export function CustomerList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isLoading && (
+              {showLoading && (
                 <>
                   <TableRow>
                     <TableCell colSpan={4}><Skeleton className="h-8 w-full" /></TableCell>
@@ -182,7 +184,7 @@ export function CustomerList() {
                   </TableRow>
                 </>
               )}
-              {!isLoading && customers?.map((customer) => (
+              {!showLoading && customers?.map((customer) => (
                 <TableRow key={customer.id} className="cursor-pointer" onClick={() => router.push(`/customers/${customer.id}`)}>
                   <TableCell>
                     <div className="font-medium">{customer.name}</div>

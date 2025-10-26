@@ -1,6 +1,6 @@
 'use client';
 
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import {
   Carousel,
   CarouselContent,
@@ -16,15 +16,16 @@ import { KnowledgeBaseCard } from './knowledge-base-card';
 
 export function KnowledgeBaseCarousel() {
   const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
 
   const articlesQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !user) return null;
     return query(collection(firestore, 'knowledge_base_articles'), limit(5));
-  }, [firestore]);
+  }, [firestore, user]);
 
   const { data: articles, isLoading } = useCollection<Omit<KnowledgeBaseArticle, 'id'>>(articlesQuery);
 
-  if (isLoading) {
+  if (isLoading || isUserLoading) {
     return (
       <div className="flex space-x-4 rtl:space-x-reverse">
         <Skeleton className="h-48 w-1/3" />

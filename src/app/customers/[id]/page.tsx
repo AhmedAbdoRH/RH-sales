@@ -29,19 +29,19 @@ export default async function CustomerProfilePage({ params }: { params: { id: st
         <Card>
           <CardHeader>
             <CardTitle>الاهتمامات</CardTitle>
-            <CardDescription>سجل اهتمام جديد للعميل وقم بتحليله.</CardDescription>
+            <CardDescription>سجل اهتمام جديد للعميل.</CardDescription>
           </CardHeader>
           <CardContent>
-            <AddConcernForm customerId={customer.id} />
+            <AddConcernForm customerId={customer.id} title="الاهتمام" />
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
             <CardTitle>المخاوف</CardTitle>
-            <CardDescription>سجل مخاوف جديدة للعميل وقم بتحليلها.</CardDescription>
+            <CardDescription>سجل مخاوف جديدة للعميل.</CardDescription>
           </CardHeader>
           <CardContent>
-            <AddConcernForm customerId={customer.id} />
+            <AddConcernForm customerId={customer.id} title="المخاوف" />
           </CardContent>
         </Card>
       </div>

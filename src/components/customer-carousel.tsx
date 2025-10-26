@@ -39,7 +39,7 @@ export function CustomerCarousel() {
     return query(collection(firestore, 'customers'), limit(5));
   }, [firestore, user]);
 
-  const { data: customers, isLoading } = useCollection<Omit<Customer, 'id'>>(customersQuery);
+  const { data: customers, isLoading } = useCollection<Customer>(customersQuery);
   
   const handleEditClick = (e: React.MouseEvent, customerId: string) => {
     e.stopPropagation();
@@ -70,10 +70,9 @@ export function CustomerCarousel() {
   if (isLoading || isUserLoading) {
     return (
       <div className="flex space-x-4 rtl:space-x-reverse">
-        <Skeleton className="h-24 w-1/4" />
-        <Skeleton className="h-24 w-1/4" />
-        <Skeleton className="h-24 w-1/4" />
-        <Skeleton className="h-24 w-1/4" />
+        <Skeleton className="h-48 w-1/3" />
+        <Skeleton className="h-48 w-1/3" />
+        <Skeleton className="h-48 w-1/3" />
       </div>
     );
   }
@@ -83,7 +82,7 @@ export function CustomerCarousel() {
       <Carousel opts={{ align: 'start', direction: 'rtl' }} className="w-full">
         <CarouselContent>
           {customers?.map((customer) => (
-            <CarouselItem key={customer.id} className="pl-4 md:basis-1/3 lg:basis-1/4">
+            <CarouselItem key={customer.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
               <div className="p-1 h-full">
                   <Card className="hover:border-primary transition-colors h-full flex flex-col">
                     <CardHeader className="flex flex-row items-start justify-between">
@@ -104,8 +103,25 @@ export function CustomerCarousel() {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </CardHeader>
-                    <CardContent className="flex flex-col items-center justify-center p-6 pt-0 text-center flex-grow cursor-pointer" onClick={() => router.push(`/customers/${customer.id}`)}>
-                      <p className="text-sm text-muted-foreground">{customer.company}</p>
+                    <CardContent className="flex-grow space-y-3 cursor-pointer p-6 pt-0" onClick={() => router.push(`/customers/${customer.id}`)}>
+                      {customer.generalInfo && (
+                        <div>
+                          <h4 className="text-sm font-semibold mb-1">معلومات عامة</h4>
+                          <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-2">{customer.generalInfo}</p>
+                        </div>
+                      )}
+                      {customer.needs && (
+                         <div>
+                          <h4 className="text-sm font-semibold mb-1">الاحتياجات</h4>
+                          <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-2">{customer.needs}</p>
+                        </div>
+                      )}
+                      {customer.customerConcerns && (
+                        <div>
+                          <h4 className="text-sm font-semibold mb-1">المخاوف</h4>
+                          <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-2">{customer.customerConcerns}</p>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
               </div>
@@ -126,7 +142,7 @@ export function CustomerCarousel() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>إلغاء</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete}>متابعة</AlertDialogAction>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive hover:bg-destructive/90">حذف</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

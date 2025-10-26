@@ -11,11 +11,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function CustomerProfilePage({ params }: { params: { id: string } }) {
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
+  const customerId = params.id;
   
   const customerRef = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return doc(firestore, 'customers', params.id);
-  }, [firestore, params.id, user]);
+    return doc(firestore, 'customers', customerId);
+  }, [firestore, customerId, user]);
 
   const { data: customer, isLoading } = useDoc<Omit<Customer, 'id'>>(customerRef);
 
@@ -53,7 +54,7 @@ export default function CustomerProfilePage({ params }: { params: { id: string }
             <CardDescription>سجل اهتمام جديد للعميل.</CardDescription>
           </CardHeader>
           <CardContent>
-            <AddConcernForm customerId={params.id} title="الاهتمام" />
+            <AddConcernForm customerId={customerId} title="الاهتمام" />
           </CardContent>
         </Card>
         <Card>
@@ -62,7 +63,7 @@ export default function CustomerProfilePage({ params }: { params: { id: string }
             <CardDescription>سجل مخاوف جديدة للعميل.</CardDescription>
           </CardHeader>
           <CardContent>
-            <AddConcernForm customerId={params.id} title="المخاوف" />
+            <AddConcernForm customerId={customerId} title="المخاوف" />
           </CardContent>
         </Card>
       </div>

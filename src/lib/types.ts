@@ -2,8 +2,8 @@ export type Customer = {
   id: string;
   name: string;
   email: string;
-  company: string;
-  phone: string;
+  company?: string;
+  phone?: string;
   avatarUrl?: string; // Made avatar optional
   addedDate: any; // Can be a string or a Firestore Timestamp
 };

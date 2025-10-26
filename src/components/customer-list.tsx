@@ -56,27 +56,23 @@ export function CustomerList() {
     const formData = new FormData(event.currentTarget);
     
     const name = formData.get('name') as string;
-    const email = formData.get('email') as string;
-    const company = formData.get('company') as string;
-    const phone = formData.get('phone') as string;
 
-    if (!firestore || !name || !email) {
+    if (!firestore || !name) {
         toast({
             title: "خطأ",
-            description: "الاسم والبريد الإلكتروني مطلوبان.",
+            description: "الاسم مطلوب.",
             variant: "destructive"
         });
         return;
     }
     
-    const newCustomer = { name, email, company, phone };
-    addCustomer(firestore, newCustomer);
+    addCustomer(firestore, { name });
     
     setOpenAddDialog(false);
     
     toast({
       title: "تمت إضافة العميل",
-      description: `تمت إضافة ${newCustomer.name} إلى قاعدة بياناتك.`,
+      description: `تمت إضافة ${name} إلى قاعدة بياناتك.`,
     });
   };
 
@@ -121,7 +117,7 @@ export function CustomerList() {
               <DialogHeader>
                 <DialogTitle>إضافة عميل جديد</DialogTitle>
                 <DialogDescription>
-                  املأ تفاصيل ملف العميل الجديد. انقر على "حفظ" عند الانتهاء.
+                  اكتب اسم العميل الجديد. انقر على "حفظ" عند الانتهاء.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
@@ -130,24 +126,6 @@ export function CustomerList() {
                     الاسم
                   </Label>
                   <Input id="name" name="name" className="col-span-3" required />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">
-                    البريد الإلكتروني
-                  </Label>
-                  <Input id="email" name="email" type="email" className="col-span-3" required />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="company" className="text-right">
-                    الشركة
-                  </Label>
-                  <Input id="company" name="company" className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="phone" className="text-right">
-                    الهاتف
-                  </Label>
-                  <Input id="phone" name="phone" className="col-span-3" />
                 </div>
               </div>
               <DialogFooter>

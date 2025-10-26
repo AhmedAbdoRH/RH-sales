@@ -8,10 +8,17 @@ import {
 import { type Firestore } from 'firebase/firestore';
 import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
-export const addCustomer = (firestore: Firestore, customer: Omit<Customer, 'id' | 'addedDate'>) => {
+// Using Partial<Customer> to allow adding a customer with just a name
+export const addCustomer = (firestore: Firestore, customer: Partial<Omit<Customer, 'id' | 'addedDate'>>) => {
   const customerCollection = collection(firestore, 'customers');
+  // Generate a placeholder email based on name and a timestamp
+  const placeholderEmail = `${customer.name?.toLowerCase().replace(/\s/g, '.')}@placeholder.email`;
+  
   const newCustomer = {
-    ...customer,
+    name: customer.name || "Unnamed Customer",
+    email: customer.email || placeholderEmail,
+    company: customer.company || '',
+    phone: customer.phone || '',
     addedDate: Timestamp.now(),
   }
   addDocumentNonBlocking(customerCollection, newCustomer);

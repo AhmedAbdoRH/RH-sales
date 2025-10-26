@@ -44,26 +44,22 @@ export function FloatingAddButton() {
     const formData = new FormData(event.currentTarget);
     
     const name = formData.get('name') as string;
-    const email = formData.get('email') as string;
-    const company = formData.get('company') as string;
-    const phone = formData.get('phone') as string;
 
-    if (!firestore || !name || !email) {
+    if (!firestore || !name) {
         toast({
             title: "خطأ",
-            description: "الاسم والبريد الإلكتروني مطلوبان.",
+            description: "الاسم مطلوب.",
             variant: "destructive"
         });
         return;
     }
     
-    const newCustomer = { name, email, company, phone };
-    addCustomer(firestore, newCustomer);
+    addCustomer(firestore, { name });
     
     setOpenDialog(null);
     toast({
       title: "تمت إضافة العميل",
-      description: `تمت إضافة ${newCustomer.name} إلى قاعدة بياناتك.`,
+      description: `تمت إضافة ${name} إلى قاعدة بياناتك.`,
     });
   };
 
@@ -117,9 +113,25 @@ export function FloatingAddButton() {
   return (
     <TooltipProvider>
       <div className="fixed bottom-6 left-6 z-50">
-        <div className="relative flex flex-col items-center gap-2">
-           {isOpen && (
-              <div className="flex flex-col-reverse items-center gap-2">
+        <div className="relative flex flex-col-reverse items-center gap-2">
+           
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                  <Button 
+                      size="icon" 
+                      className="rounded-full w-14 h-14 shadow-lg"
+                      onClick={() => setIsOpen(!isOpen)}
+                  >
+                      <Plus className={cn("h-6 w-6 transition-transform duration-300", isOpen && "rotate-45")} />
+                  </Button>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                  <p>{isOpen ? 'إغلاق' : 'إضافة جديدة'}</p>
+              </TooltipContent>
+            </Tooltip>
+
+            {isOpen && (
+              <div className="flex flex-col items-center gap-2">
                 {menuItems.map((item, index) => (
                     <div
                         key={item.label}
@@ -147,21 +159,6 @@ export function FloatingAddButton() {
                 ))}
               </div>
             )}
-            
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild>
-                  <Button 
-                      size="icon" 
-                      className="rounded-full w-14 h-14 shadow-lg"
-                      onClick={() => setIsOpen(!isOpen)}
-                  >
-                      <Plus className={cn("h-6 w-6 transition-transform duration-300", isOpen && "rotate-45")} />
-                  </Button>
-              </TooltipTrigger>
-              <TooltipContent side="left">
-                  <p>{isOpen ? 'إغلاق' : 'إضافة جديدة'}</p>
-              </TooltipContent>
-            </Tooltip>
         </div>
       </div>
       
@@ -172,25 +169,13 @@ export function FloatingAddButton() {
               <DialogHeader>
                 <DialogTitle>إضافة عميل جديد</DialogTitle>
                 <DialogDescription>
-                  املأ تفاصيل ملف العميل الجديد. انقر على "حفظ" عند الانتهاء.
+                  اكتب اسم العميل الجديد. انقر على "حفظ" عند الانتهاء.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="name" className="text-right">الاسم</Label>
                   <Input id="name" name="name" className="col-span-3" required />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">البريد الإلكتروني</Label>
-                  <Input id="email" name="email" type="email" className="col-span-3" required />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="company" className="text-right">الشركة</Label>
-                  <Input id="company" name="company" className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="phone" className="text-right">الهاتف</Label>
-                  <Input id="phone" name="phone" className="col-span-3" />
                 </div>
               </div>
               <DialogFooter>

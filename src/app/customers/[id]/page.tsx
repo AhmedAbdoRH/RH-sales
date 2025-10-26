@@ -7,6 +7,7 @@ import { AddConcernForm } from '@/components/add-concern-form';
 import type { Customer } from '@/lib/types';
 import { doc } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Mail, Phone } from 'lucide-react';
 
 export default function CustomerProfilePage({ params }: { params: { id: string } }) {
   const customerId = params.id;
@@ -27,7 +28,7 @@ export default function CustomerProfilePage({ params }: { params: { id: string }
               <Skeleton className="h-10 w-1/2" />
               <Skeleton className="h-6 w-1/4 mt-2" />
             </div>
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <Skeleton className="h-48 w-full" />
                 <Skeleton className="h-48 w-full" />
                 <Skeleton className="h-48 w-full" />
@@ -50,6 +51,28 @@ export default function CustomerProfilePage({ params }: { params: { id: string }
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card className="lg:col-span-1">
+            <CardHeader>
+                <CardTitle>معلومات الاتصال</CardTitle>
+                <CardDescription>طرق التواصل مع العميل.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+                <div className="flex items-center gap-3">
+                    <Mail className="h-5 w-5 text-muted-foreground" />
+                    <a href={`mailto:${customer.email}`} className="text-sm text-primary hover:underline">
+                        {customer.email}
+                    </a>
+                </div>
+                {customer.phone && (
+                    <div className="flex items-center gap-3">
+                        <Phone className="h-5 w-5 text-muted-foreground" />
+                        <a href={`tel:${customer.phone}`} className="text-sm text-primary hover:underline">
+                            {customer.phone}
+                        </a>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>الاحتياجات</CardTitle>
             <CardDescription>احتياجات العميل المسجلة.</CardDescription>
@@ -67,7 +90,7 @@ export default function CustomerProfilePage({ params }: { params: { id: string }
              <p className="text-sm text-muted-foreground">{customer.customerConcerns || 'لم تسجل مخاوف.'}</p>
           </CardContent>
         </Card>
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle>تسجيل اهتمام جديد</CardTitle>
             <CardDescription>سجل اهتمامًا أو سؤالًا جديدًا لهذا العميل ليتم تحليله.</CardDescription>

@@ -44,6 +44,7 @@ export function FloatingAddButton() {
     const formData = new FormData(event.currentTarget);
     
     const name = formData.get('name') as string;
+    const phone = formData.get('phone') as string;
     const generalInfo = formData.get('generalInfo') as string;
     const needs = formData.get('needs') as string;
     const customerConcerns = formData.get('customerConcerns') as string;
@@ -57,7 +58,7 @@ export function FloatingAddButton() {
         return;
     }
     
-    addCustomer(firestore, { name, generalInfo, needs, customerConcerns });
+    addCustomer(firestore, { name, phone, generalInfo, needs, customerConcerns });
     
     setOpenDialog(null);
     toast({
@@ -181,6 +182,12 @@ export function FloatingAddButton() {
                     الاسم
                   </Label>
                   <Input id="name" name="name" className="col-span-3" required />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="phone" className="text-right">
+                    رقم الهاتف
+                  </Label>
+                  <Input id="phone" name="phone" className="col-span-3" />
                 </div>
                 <div className="grid grid-cols-4 items-start gap-4">
                   <Label htmlFor="generalInfo" className="text-right pt-2">

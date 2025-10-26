@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, Phone } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -32,7 +32,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import { addCustomer, deleteCustomer, updateCustomer } from '@/lib/data';
@@ -63,6 +63,7 @@ export function CustomerList() {
 
     const formData = new FormData(event.currentTarget);
     const name = formData.get('name') as string;
+    const phone = formData.get('phone') as string;
     const generalInfo = formData.get('generalInfo') as string;
     const needs = formData.get('needs') as string;
     const customerConcerns = formData.get('customerConcerns') as string;
@@ -73,10 +74,10 @@ export function CustomerList() {
     }
     
     if (dialogMode === 'edit' && selectedCustomer) {
-      updateCustomer(firestore, selectedCustomer.id, { name, generalInfo, needs, customerConcerns });
+      updateCustomer(firestore, selectedCustomer.id, { name, phone, generalInfo, needs, customerConcerns });
       toast({ title: "تم تحديث العميل", description: `تم تحديث بيانات ${name}.` });
     } else {
-      addCustomer(firestore, { name, generalInfo, needs, customerConcerns });
+      addCustomer(firestore, { name, phone, generalInfo, needs, customerConcerns });
       toast({ title: "تمت إضافة العميل", description: `تمت إضافة ${name} إلى قاعدة بياناتك.` });
     }
     
@@ -182,6 +183,16 @@ export function CustomerList() {
                 </div>
               )}
             </CardContent>
+            {customer.phone && (
+                <CardFooter>
+                    <Button variant="outline" size="sm" className="w-full" asChild>
+                        <a href={`tel:${customer.phone}`}>
+                            <Phone className="ml-2 h-4 w-4" />
+                            اتصال
+                        </a>
+                    </Button>
+                </CardFooter>
+            )}
           </Card>
         ))}
       </div>
@@ -199,6 +210,10 @@ export function CustomerList() {
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">الاسم</Label>
                 <Input id="name" name="name" defaultValue={selectedCustomer?.name} className="col-span-3" required />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="phone" className="text-right">رقم الهاتف</Label>
+                <Input id="phone" name="phone" defaultValue={selectedCustomer?.phone} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-start gap-4">
                 <Label htmlFor="generalInfo" className="text-right pt-2">معلومات عامة</Label>

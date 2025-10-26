@@ -8,7 +8,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection, limit, query } from 'firebase/firestore';
 import { Skeleton } from './ui/skeleton';
@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Phone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { deleteCustomer } from '@/lib/data';
@@ -123,6 +123,16 @@ export function CustomerCarousel() {
                         </div>
                       )}
                     </CardContent>
+                     {customer.phone && (
+                        <CardFooter className="pt-0">
+                            <Button variant="outline" size="sm" className="w-full" asChild>
+                                <a href={`tel:${customer.phone}`}>
+                                    <Phone className="ml-2 h-4 w-4" />
+                                    اتصال
+                                </a>
+                            </Button>
+                        </CardFooter>
+                    )}
                   </Card>
               </div>
             </CarouselItem>

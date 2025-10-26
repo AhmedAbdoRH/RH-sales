@@ -50,8 +50,8 @@ export function AddConcernForm({ customerId, title }: { customerId: string, titl
         <Textarea
           id="concern"
           name="concern"
-          placeholder={`مثال: 'السعر مرتفع جدًا مقارنة بـ...'`}
-          rows={5}
+          placeholder=""
+          rows={3}
           required
         />
       </div>

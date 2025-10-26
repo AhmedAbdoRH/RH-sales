@@ -1,16 +1,8 @@
 "use client";
 
 import type { Customer } from '@/lib/types';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +23,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import { addCustomer } from '@/lib/data';
@@ -108,7 +100,7 @@ export function CustomerList() {
 
   return (
     <>
-      <div className="flex justify-end">
+      <div className="flex justify-end mb-6">
         <Dialog open={openAddDialog} onOpenChange={setOpenAddDialog}>
           <DialogTrigger asChild>
             <Button>
@@ -157,44 +149,25 @@ export function CustomerList() {
           </DialogContent>
         </Dialog>
       </div>
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>العميل</TableHead>
-                <TableHead>الشركة</TableHead>
-                <TableHead className="hidden md:table-cell">تاريخ الانضمام</TableHead>
-                <TableHead>
-                  <span className="sr-only">إجراءات</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {showLoading && (
-                <>
-                  <TableRow>
-                    <TableCell colSpan={4}><Skeleton className="h-8 w-full" /></TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell colSpan={4}><Skeleton className="h-8 w-full" /></TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell colSpan={4}><Skeleton className="h-8 w-full" /></TableCell>
-                  </TableRow>
-                </>
-              )}
-              {!showLoading && customers?.map((customer) => (
-                <TableRow key={customer.id} className="cursor-pointer" onClick={() => router.push(`/customers/${customer.id}`)}>
-                  <TableCell>
-                    <div className="font-medium">{customer.name}</div>
-                  </TableCell>
-                  <TableCell>{customer.company}</TableCell>
-                  <TableCell className="hidden text-muted-foreground md:table-cell">
-                    {formatDate(customer.addedDate)}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
+
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {showLoading && (
+            <>
+              <Skeleton className="h-64 w-full" />
+              <Skeleton className="h-64 w-full" />
+              <Skeleton className="h-64 w-full" />
+            </>
+          )}
+          {!showLoading && customers?.map((customer) => (
+            <Card key={customer.id} className="flex flex-col">
+              <CardHeader className="flex flex-row items-start justify-between">
+                <div onClick={() => router.push(`/customers/${customer.id}`)} className="cursor-pointer space-y-1">
+                  <CardTitle className="text-xl">{customer.name}</CardTitle>
+                   <p className="text-xs text-muted-foreground">
+                      تاريخ الانضمام: {formatDate(customer.addedDate)}
+                   </p>
+                </div>
+                 <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button aria-haspopup="true" size="icon" variant="ghost" onClick={(e) => e.stopPropagation()}>
                           <MoreHorizontal className="h-4 w-4" />
@@ -207,13 +180,30 @@ export function CustomerList() {
                         <DropdownMenuItem className="text-destructive" onSelect={(e) => handleDeleteClick(e, customer.id)}>حذف</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </CardHeader>
+              <CardContent className="flex-grow space-y-4 cursor-pointer" onClick={() => router.push(`/customers/${customer.id}`)}>
+                {customer.generalInfo && (
+                  <div>
+                    <h4 className="text-sm font-semibold mb-1">معلومات عامة</h4>
+                    <p className="text-sm text-muted-foreground">{customer.generalInfo}</p>
+                  </div>
+                )}
+                {customer.needs && (
+                   <div>
+                    <h4 className="text-sm font-semibold mb-1">الاحتياجات</h4>
+                    <p className="text-sm text-muted-foreground">{customer.needs}</p>
+                  </div>
+                )}
+                {customer.customerConcerns && (
+                  <div>
+                    <h4 className="text-sm font-semibold mb-1">المخاوف</h4>
+                    <p className="text-sm text-muted-foreground">{customer.customerConcerns}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
     </>
   );
 }

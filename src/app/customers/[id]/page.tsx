@@ -32,18 +32,20 @@ export default async function CustomerProfilePage({ params }: { params: { id: st
             </div>
         </div>
       </div>
-      <div className="grid gap-6 md:grid-cols-3">
-        <div className="md:col-span-3 flex flex-col gap-6">
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>إضافة اهتمام جديد</CardTitle>
-              <CardDescription>سجل اهتمام عميل جديد وقم بتحليله باستخدام الذكاء الاصطناعي.</CardDescription>
+              <CardTitle>إضافة اهتمام/مخاوف جديدة</CardTitle>
+              <CardDescription>سجل مخاوف العميل وقم بتحليلها باستخدام الذكاء الاصطناعي.</CardDescription>
             </CardHeader>
             <CardContent>
               <AddConcernForm customerId={customer.id} />
             </CardContent>
           </Card>
+        </div>
 
+        <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
               <CardTitle>سجل الاهتمامات</CardTitle>

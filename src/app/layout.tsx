@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Toaster } from "@/components/ui/toaster"
 import { FirebaseClientProvider } from '@/firebase';
 import { AuthProvider } from '@/components/auth-provider';
+import { FloatingAddButton } from '@/components/floating-add-button';
 
 export const metadata: Metadata = {
   title: 'مركز محترفي المبيعات',
@@ -70,6 +71,7 @@ export default function RootLayout({
                     </div>
                 </header>
                 <main className="flex-1 p-4 md:p-6">{children}</main>
+                 <FloatingAddButton />
             </div>
             <Toaster />
           </AuthProvider>

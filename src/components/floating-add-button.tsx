@@ -112,8 +112,8 @@ export function FloatingAddButton() {
 
   const menuItems = [
     { label: "عميل", icon: UserPlus, action: () => handleActionClick("customer") },
-    { label: "مقال", icon: BookPlus, action: () => handleActionClick("article") },
     { label: "مهارة", icon: Star, action: () => handleActionClick("skill") },
+    { label: "أهم المعلومات", icon: BookPlus, action: () => handleActionClick("article") },
   ];
 
   return (
@@ -207,8 +207,8 @@ export function FloatingAddButton() {
         <DialogContent className="sm:max-w-[425px]">
             <form onSubmit={handleAddArticle}>
               <DialogHeader>
-                <DialogTitle>إضافة مقال جديد</DialogTitle>
-                <DialogDescription>أضف مقالاً جديداً إلى قاعدة المعرفة.</DialogDescription>
+                <DialogTitle>إضافة معلومة جديدة</DialogTitle>
+                <DialogDescription>أضف معلومة جديدة إلى قاعدة المعرفة.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
@@ -229,7 +229,7 @@ export function FloatingAddButton() {
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit">حفظ المقال</Button>
+                <Button type="submit">حفظ المعلومة</Button>
               </DialogFooter>
             </form>
           </DialogContent>

@@ -51,7 +51,7 @@ export function AddConcernForm({ customerId, title }: { customerId: string, titl
           id="concern"
           name="concern"
           placeholder=""
-          rows={3}
+          rows={2}
           required
         />
       </div>

@@ -72,21 +72,19 @@ export function FloatingAddButton() {
     const formData = new FormData(event.currentTarget);
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
-    const category = formData.get('category') as string;
-    const tags = (formData.get('tags') as string).split(',').map(tag => tag.trim());
 
-     if (!firestore || !title || !content || !category) {
+     if (!firestore || !title || !content) {
         toast({
             title: "خطأ",
-            description: "العنوان والمحتوى والفئة مطلوبة.",
+            description: "العنوان والمحتوى مطلوبان.",
             variant: "destructive"
         });
         return;
     }
 
-    addKnowledgeBaseArticle(firestore, { title, content, category, tags });
+    addKnowledgeBaseArticle(firestore, { title, content, category: 'عام', tags: [] });
     setOpenDialog(null);
-    toast({ title: "تمت إضافة المقال", description: `تمت إضافة مقال "${title}" بنجاح.` });
+    toast({ title: "تمت إضافة المعلومة", description: `تمت إضافة "${title}" بنجاح.` });
   };
 
   const handleAddSkill = (event: React.FormEvent<HTMLFormElement>) => {
@@ -218,14 +216,6 @@ export function FloatingAddButton() {
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="content" className="text-right">المحتوى</Label>
                   <Textarea id="content" name="content" className="col-span-3" required />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="category" className="text-right">الفئة</Label>
-                  <Input id="category" name="category" className="col-span-3" required />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="tags" className="text-right">الوسوم</Label>
-                  <Input id="tags" name="tags" className="col-span-3" placeholder="مبيعات, مفاوضات" />
                 </div>
               </div>
               <DialogFooter>

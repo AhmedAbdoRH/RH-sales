@@ -40,13 +40,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">لوحة التحكم</h1>
-        <p className="text-muted-foreground">
-          أهلاً بك في مساعد المبيعات الخاص بك. إليك ملخص لنشاط العملاء.
-        </p>
-      </div>
-
       {/* Section 1: Recent Concerns */}
       <section>
         <h2 className="text-2xl font-semibold tracking-tight mb-4">أحدث الاهتمامات</h2>

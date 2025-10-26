@@ -10,6 +10,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { KnowledgeBaseCard } from '@/components/knowledge-base-card';
 
 export default async function DashboardPage() {
   const customers = await getCustomers();
@@ -54,15 +55,7 @@ export default async function DashboardPage() {
             {articles.slice(0, 5).map((article) => (
               <CarouselItem key={article.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
                 <div className="p-1 h-full">
-                    <Card className="h-full flex flex-col">
-                      <CardHeader>
-                        <CardTitle className="text-lg">{article.title}</CardTitle>
-                        <CardDescription>{article.category}</CardDescription>
-                      </CardHeader>
-                      <CardContent className="flex-grow">
-                        <p className="text-sm text-muted-foreground line-clamp-3">{article.content}</p>
-                      </CardContent>
-                    </Card>
+                  <KnowledgeBaseCard article={article} />
                 </div>
               </CarouselItem>
             ))}

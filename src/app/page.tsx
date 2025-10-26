@@ -1,3 +1,5 @@
+'use client';
+
 import { salesSkills } from '@/lib/skills';
 import {
   Carousel,
@@ -8,15 +10,10 @@ import {
 } from '@/components/ui/carousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
-import { KnowledgeBaseCard } from '@/components/knowledge-base-card';
-import { CustomerList } from '@/components/customer-list';
-import { KnowledgeBaseClient } from '@/components/knowledge-base-client';
-import { getKnowledgeBaseArticles } from '@/lib/data';
 import { CustomerCarousel } from '@/components/customer-carousel';
+import { KnowledgeBaseCarousel } from '@/components/knowledge-base-carousel';
 
-export default async function DashboardPage() {
-  const articles = await getKnowledgeBaseArticles();
-
+export default function DashboardPage() {
   return (
     <div className="space-y-8">
         {/* Section 1: Top Required Skills */}
@@ -63,19 +60,7 @@ export default async function DashboardPage() {
                     عرض الكل
                 </Link>
             </div>
-            <Carousel opts={{ align: 'start', direction: 'rtl' }} className="w-full">
-            <CarouselContent>
-                {articles.slice(0, 5).map((article) => (
-                <CarouselItem key={article.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                    <div className="p-1 h-full">
-                    <KnowledgeBaseCard article={article} />
-                    </div>
-                </CarouselItem>
-                ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-            </Carousel>
+            <KnowledgeBaseCarousel />
         </section>
     </div>
   );

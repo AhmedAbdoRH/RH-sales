@@ -41,14 +41,6 @@ const concerns: Concern[] = [
   { id: 'c8', customerId: '6', date: '2024-04-18', originalText: "We need a solution that can scale with our company's growth over the next 5 years.", summary: 'Scalability for future growth', category: 'Features', status: 'analyzed' },
 ];
 
-const knowledgeBaseArticles: KnowledgeBaseArticle[] = [
-    { id: 'kb1', title: "Handling Price Objections", category: "Objection Handling", content: "When a customer says the price is too high, first acknowledge their concern. Then, pivot to the value and ROI. Use the 'price vs. cost' framework to explain the long-term benefits.", tags: ["pricing", "negotiation", "value"] },
-    { id: 'kb2', title: "Competitor Comparison: Innovate Inc.", category: "Competitive Intelligence", content: "Innovate Inc. focuses on a low-cost entry model but lacks our advanced automation features and dedicated support. Highlight our superior TCO (Total Cost of Ownership).", tags: ["competitor", "innovate inc", "features"] },
-    { id: 'kb3', title: "Explaining the Integration Process", category: "Technical Sales", content: "Our integration process is a 3-step guided workflow. It starts with a discovery call, followed by sandbox testing, and finally, a phased production rollout. The average time to go-live is 2 weeks.", tags: ["integration", "onboarding", "technical"] },
-    { id: 'kb4', title: "Standard Support Package Details", category: "Support & SLA", content: "Our standard support package includes 24/7 email support, with a 4-hour response time for critical issues. Phone support is available during business hours (9am-5pm customer's time).", tags: ["support", "sla", "service"] },
-    { id: 'kb5', title: "Upselling to the Enterprise Plan", category: "Sales Techniques", content: "Identify customers who are hitting usage limits or requesting features only available in the Enterprise plan. Frame the upgrade as a solution to their growing needs and a way to unlock more value.", tags: ["upselling", "enterprise", "growth"] },
-];
-
 // New Firestore-based functions
 
 export const addCustomer = (firestore: Firestore, customer: Omit<Customer, 'id' | 'addedDate'>) => {
@@ -91,6 +83,8 @@ export const getConcernsByCustomerId = async (customerId: string): Promise<Conce
     return new Promise(resolve => setTimeout(() => resolve(concerns.filter(c => c.customerId === customerId)), 50));
 };
 
-export const getKnowledgeBaseArticles = async (): Promise<KnowledgeBaseArticle[]> => {
-    return new Promise(resolve => setTimeout(() => resolve(knowledgeBaseArticles), 50));
+export const getKnowledgeBaseArticles = async (firestore: Firestore): Promise<KnowledgeBaseArticle[]> => {
+  const articlesCollection = collection(firestore, 'knowledge_base_articles');
+  const snapshot = await getDocs(articlesCollection);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as KnowledgeBaseArticle));
 };

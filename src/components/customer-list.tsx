@@ -2,7 +2,6 @@
 
 import type { Customer } from '@/lib/types';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,7 +39,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from './ui/textarea';
 
 export function CustomerList() {
-  const router = useRouter();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
@@ -143,7 +141,7 @@ export function CustomerList() {
         {!showLoading && customers?.map((customer) => (
           <Card key={customer.id} className="flex flex-col">
             <CardHeader className="flex flex-row items-start justify-between">
-              <div onClick={() => router.push(`/customers/${customer.id}`)} className="cursor-pointer space-y-1">
+              <div onClick={(e) => handleEditClick(e, customer)} className="cursor-pointer space-y-1">
                 <CardTitle className="text-xl">{customer.name}</CardTitle>
                 <p className="text-xs text-muted-foreground">
                   تاريخ الانضمام: {formatDate(customer.addedDate)}
@@ -157,13 +155,12 @@ export function CustomerList() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onSelect={() => router.push(`/customers/${customer.id}`)}>عرض</DropdownMenuItem>
                   <DropdownMenuItem onSelect={(e) => handleEditClick(e, customer)}>تعديل</DropdownMenuItem>
                   <DropdownMenuItem className="text-destructive" onSelect={(e) => handleDeleteClick(e, customer.id)}>حذف</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </CardHeader>
-            <CardContent className="flex-grow space-y-4 cursor-pointer" onClick={() => router.push(`/customers/${customer.id}`)}>
+            <CardContent className="flex-grow space-y-4 cursor-pointer" onClick={(e) => handleEditClick(e, customer)}>
               {customer.generalInfo && (
                 <div>
                   <h4 className="text-sm font-semibold mb-1">معلومات عامة</h4>

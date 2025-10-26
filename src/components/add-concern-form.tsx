@@ -19,7 +19,7 @@ const initialState: FormState = {
 function AnalyzeButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending}>
+    <Button type="submit" disabled={pending} className="w-full justify-center">
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
       تحليل بالذكاء الاصطناعي
     </Button>
@@ -84,9 +84,8 @@ export function AddConcernForm({ customerId }: { customerId: string }) {
           required
         />
       </div>
-      <AnalyzeButton />
 
-      {state.success && (
+      {state.success ? (
         <div className="space-y-4 rounded-lg border bg-muted/50 p-4 animate-in fade-in-50">
           <h4 className="font-semibold">نتائج تحليل الذكاء الاصطناعي</h4>
           <div>
@@ -97,11 +96,13 @@ export function AddConcernForm({ customerId }: { customerId: string }) {
             <Label htmlFor="category">الفئة المقترحة</Label>
             <Input id="category" name="category" defaultValue={state.category} />
           </div>
-          <Button onClick={handleSaveConcern}>
+          <Button onClick={handleSaveConcern} className="w-full justify-center">
             <Save className="mr-2 h-4 w-4" />
             حفظ الاهتمام في الملف الشخصي
           </Button>
         </div>
+      ) : (
+        <AnalyzeButton />
       )}
     </form>
   );

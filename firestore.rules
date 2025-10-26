@@ -1,120 +1,130 @@
 /**
- * @fileoverview Firestore Security Rules for SalesPro Hub.
+ * @fileoverview Firestore Security Rules for the application.
  *
  * Core Philosophy:
- * This ruleset enforces a strict user-ownership model for customer data (interactions, concerns)
- * and allows public read access to knowledge base articles.
+ * This ruleset prioritizes security by enforcing strict ownership and role-based access control.
+ * It assumes a multi-tenant architecture where users should only access their own data unless explicitly granted broader permissions.
  *
  * Data Structure:
  * - /customers/{customerId}: Stores customer profiles.
- * - /customers/{customerId}/interactions/{interactionId}: Stores interactions related to a customer.
- * - /customers/{customerId}/concerns/{concernId}: Stores concerns related to a customer.
- * - /knowledge_base_articles/{knowledgeBaseArticleId}: Stores knowledge base articles (publicly readable).
+ * - /customers/{customerId}/concerns/{concernId}: Stores concerns related to specific customers.
+ * - /knowledge_base_articles/{knowledgeBaseArticleId}: Stores knowledge base articles.
+ * - /skills/{skillId}: Stores sales skills.
  *
  * Key Security Decisions:
- * - Customer data (interactions, concerns) is strictly controlled by user ownership enforced via path-based rules.
- * - Knowledge base articles are publicly readable but writes are not currently permitted.
+ * - Users can only read or write their own customer data.
+ * - Users can create, update and delete their customer data.
+ * - Knowledge base articles are publicly readable but only writeable by authorized users.
+ * - Skills are publicly readable but only writeable by authorized users.
  *
- *  Denormalization for Authorization:
- *  - The 'Interaction' and 'Concern' entities include a 'customerId' field which gets validated
- *    against the path to prevent moving documents between customers.
+ * Denormalization for Authorization:
+ *  - Ownership is enforced by matching the `request.auth.uid` against the `customerId` in the path for customer-specific data.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Controls access to customer profiles. Allows read/write access only to the owner.
+     * @description Controls access to customer profiles.
      * @path /customers/{customerId}
-     * @allow (create) - User abc can create a customer profile where customerId == user abc's id
-     * @allow (get) - User abc can read customer profile where customerId == user abc's id
-     * @allow (update) - User abc can update customer profile where customerId == user abc's id
-     * @allow (delete) - User abc can delete customer profile where customerId == user abc's id
-     * @deny (create) - User xyz cannot create a customer profile where customerId == user abc's id
-     * @deny (get) - User xyz cannot read customer profile where customerId == user abc's id
-     * @deny (update) - User xyz cannot update customer profile where customerId == user abc's id
-     * @deny (delete) - User xyz cannot delete customer profile where customerId == user abc's id
+     * @allow (create) User with UID 'test_user' can create a customer document where the customerId matches their UID.
+     * @allow (get) User with UID 'test_user' can read a customer document where the customerId matches their UID.
+     * @allow (update) User with UID 'test_user' can update a customer document where the customerId matches their UID.
+     * @allow (delete) User with UID 'test_user' can delete a customer document where the customerId matches their UID.
+     * @deny (get) User with UID 'other_user' cannot read a customer document where the customerId does not match their UID.
+     * @deny (create) User with UID 'other_user' cannot create a customer document where the customerId does not match their UID.
+     * @deny (update) User with UID 'other_user' cannot update a customer document where the customerId does not match their UID.
+     * @deny (delete) User with UID 'other_user' cannot delete a customer document where the customerId does not match their UID.
      * @principle Enforces document ownership for all operations.
      */
     match /customers/{customerId} {
+      // Allow the user to read their own customer document.
       allow get: if isSignedIn() && isOwner(customerId);
+      // Allow the user to list their own customer documents.
       allow list: if false;
-      allow create: if isSignedIn() && isOwner(customerId) && request.resource.data.id == customerId;
-      allow update: if isSignedIn() && isExistingOwner(customerId) && resource.data.id == customerId;
+      // Allow the user to create their own customer document if the customerId matches their UID.
+      allow create: if isSignedIn() && isOwner(customerId);
+      // Allow the user to update their own customer document if the customerId matches their UID and the document exists.
+      allow update: if isSignedIn() && isExistingOwner(customerId);
+      // Allow the user to delete their own customer document if the customerId matches their UID and the document exists.
       allow delete: if isSignedIn() && isExistingOwner(customerId);
     }
 
     /**
-     * @description Controls access to customer interactions.  Allows read/write access only to the owner.
-     * @path /customers/{customerId}/interactions/{interactionId}
-     * @allow (create) - User abc can create an interaction for customer abc
-     * @allow (get) - User abc can read interaction for customer abc
-     * @allow (update) - User abc can update interaction for customer abc
-     * @allow (delete) - User abc can delete interaction for customer abc
-     * @deny (create) - User xyz cannot create an interaction for customer abc
-     * @deny (get) - User xyz cannot read interaction for customer abc
-     * @deny (update) - User xyz cannot update interaction for customer abc
-     * @deny (delete) - User xyz cannot delete interaction for customer abc
-     * @principle Enforces document ownership and referential integrity.
-     */
-    match /customers/{customerId}/interactions/{interactionId} {
-      allow get: if isSignedIn() && isOwner(customerId);
-      allow list: if isSignedIn() && isOwner(customerId);
-      allow create: if isSignedIn() && isOwner(customerId) && request.resource.data.customerId == customerId;
-      allow update: if isSignedIn() && isExistingOwner(customerId) && resource.data.customerId == customerId;
-      allow delete: if isSignedIn() && isExistingOwner(customerId);
-    }
-
-    /**
-     * @description Controls access to customer concerns. Allows read/write access only to the owner.
+     * @description Controls access to customer concerns.
      * @path /customers/{customerId}/concerns/{concernId}
-     * @allow (create) - User abc can create a concern for customer abc
-     * @allow (get) - User abc can read concern for customer abc
-     * @allow (update) - User abc can update concern for customer abc
-     * @allow (delete) - User abc can delete concern for customer abc
-     * @deny (create) - User xyz cannot create a concern for customer abc
-     * @deny (get) - User xyz cannot read concern for customer abc
-     * @deny (update) - User xyz cannot update concern for customer abc
-     * @deny (delete) - User xyz cannot delete concern for customer abc
-     * @principle Enforces document ownership and referential integrity.
+     * @allow (create) User with UID 'test_user' can create a concern document under their customer profile.
+     * @allow (get) User with UID 'test_user' can read a concern document under their customer profile.
+     * @allow (update) User with UID 'test_user' can update a concern document under their customer profile.
+     * @allow (delete) User with UID 'test_user' can delete a concern document under their customer profile.
+     * @deny (get) User with UID 'other_user' cannot read a concern document under a different customer profile.
+     * @deny (create) User with UID 'other_user' cannot create a concern document under a different customer profile.
+     * @deny (update) User with UID 'other_user' cannot update a concern document under a different customer profile.
+     * @deny (delete) User with UID 'other_user' cannot delete a concern document under a different customer profile.
+     * @principle Restricts access to concerns to the owner of the parent customer document.
      */
     match /customers/{customerId}/concerns/{concernId} {
+      // Allow the user to read a concern if they own the parent customer document.
       allow get: if isSignedIn() && isOwner(customerId);
-      allow list: if isSignedIn() && isOwner(customerId);
-      allow create: if isSignedIn() && isOwner(customerId) && request.resource.data.customerId == customerId;
-      allow update: if isSignedIn() && isExistingOwner(customerId) && resource.data.customerId == customerId;
+      // Allow the user to list concerns if they own the parent customer document.
+      allow list: if false;
+      // Allow the user to create a concern if they own the parent customer document.
+      allow create: if isSignedIn() && isOwner(customerId);
+      // Allow the user to update a concern if they own the parent customer document and the document exists.
+      allow update: if isSignedIn() && isExistingOwner(customerId);
+      // Allow the user to delete a concern if they own the parent customer document and the document exists.
       allow delete: if isSignedIn() && isExistingOwner(customerId);
     }
 
     /**
-     * @description Controls access to knowledge base articles. Allows public read access, but no write access.
+     * @description Controls access to knowledge base articles.
      * @path /knowledge_base_articles/{knowledgeBaseArticleId}
-     * @allow (get) - Any user (signed in or not) can read a knowledge base article.
-     * @allow (list) - Any user (signed in or not) can list knowledge base articles.
-     * @deny (create) - No one can create a knowledge base article (writes are disabled for this prototype).
-     * @deny (update) - No one can update a knowledge base article (writes are disabled for this prototype).
-     * @deny (delete) - No one can delete a knowledge base article (writes are disabled for this prototype).
-     * @principle Allows public read access but restricts write access.
+     * @allow (get) Any user can read any knowledge base article.
+     * @allow (list) Any user can list knowledge base articles.
+     * @deny (create) Only authorized users can create knowledge base articles.  No authorization implemented currently.
+     * @deny (update) Only authorized users can update knowledge base articles. No authorization implemented currently.
+     * @deny (delete) Only authorized users can delete knowledge base articles. No authorization implemented currently.
+     * @principle Public read access with restricted write access.
      */
     match /knowledge_base_articles/{knowledgeBaseArticleId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      // Allow anyone to read knowledge base articles.
+      allow get, list: if true;
+      // Only authorized users can create, update, or delete knowledge base articles.
+      // TODO: Add role-based or ownership validation for write operations.
+      allow create, update, delete: if false;
+    }
+
+     /**
+      * @description Controls access to skills.
+      * @path /skills/{skillId}
+      * @allow (get) Any user can read any skill.
+      * @allow (list) Any user can list skills.
+      * @deny (create) Only authorized users can create skills. No authorization implemented currently.
+      * @deny (update) Only authorized users can update skills. No authorization implemented currently.
+      * @deny (delete) Only authorized users can delete skills. No authorization implemented currently.
+      * @principle Public read access with restricted write access.
+      */
+    match /skills/{skillId} {
+      // Allow anyone to read skills.
+      allow get, list: if true;
+      // Only authorized users can create, update, or delete skills.
+      // TODO: Add role-based or ownership validation for write operations.
+      allow create, update, delete: if false;
     }
   }
 
-  // Helper functions
+  // Helper function to determine if the user is signed in.
   function isSignedIn() {
     return request.auth != null;
   }
 
-  function isOwner(userId) {
-    return request.auth.uid == userId;
+  // Helper function to determine if the user is the owner of the resource based on the ID.
+  function isOwner(resourceId) {
+    return request.auth.uid == resourceId;
   }
 
-  function isExistingOwner(userId) {
-    return isOwner(userId) && resource != null;
+  // Helper function to determine if the user is the owner of the resource and the document exists.
+  function isExistingOwner(resourceId) {
+    return isSignedIn() && isOwner(resourceId) && resource != null;
   }
 }

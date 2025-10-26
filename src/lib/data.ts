@@ -4,14 +4,18 @@ import type { Customer, KnowledgeBaseArticle, Skill } from './types';
 import {
   collection,
   Timestamp,
+  doc,
+  deleteDoc,
+  updateDoc,
+  type Firestore
 } from 'firebase/firestore';
-import { type Firestore } from 'firebase/firestore';
-import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
-// Using Partial<Customer> to allow adding a customer with just a name
+type UpdatableCustomerData = Partial<Omit<Customer, 'id' | 'addedDate' | 'email'>>;
+
+
 export const addCustomer = (firestore: Firestore, customer: Partial<Omit<Customer, 'id' | 'addedDate'>>) => {
   const customerCollection = collection(firestore, 'customers');
-  // Generate a placeholder email based on name and a timestamp
   const placeholderEmail = `${customer.name?.toLowerCase().replace(/\s/g, '.')}@placeholder.email`;
   
   const newCustomer = {
@@ -26,6 +30,17 @@ export const addCustomer = (firestore: Firestore, customer: Partial<Omit<Custome
   }
   addDocumentNonBlocking(customerCollection, newCustomer);
 };
+
+export const updateCustomer = (firestore: Firestore, customerId: string, data: UpdatableCustomerData) => {
+  const customerDoc = doc(firestore, 'customers', customerId);
+  updateDocumentNonBlocking(customerDoc, data);
+};
+
+export const deleteCustomer = (firestore: Firestore, customerId: string) => {
+  const customerDoc = doc(firestore, 'customers', customerId);
+  deleteDocumentNonBlocking(customerDoc);
+};
+
 
 export const addConcern = (firestore: Firestore, customerId: string, concernText: string, summary: string, category: string) => {
     const concernsCollection = collection(firestore, 'customers', customerId, 'concerns');

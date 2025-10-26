@@ -5,13 +5,13 @@ export type Customer = {
   company: string;
   phone: string;
   avatarUrl?: string; // Made avatar optional
-  addedDate: string;
+  addedDate: any; // Can be a string or a Firestore Timestamp
 };
 
 export type Concern = {
   id: string;
   customerId: string;
-  date: string;
+  date: any; // Can be a string or a Firestore Timestamp
   originalText: string;
   summary: string;
   category: string;
@@ -24,4 +24,10 @@ export type KnowledgeBaseArticle = {
   category: string;
   content: string;
   tags: string[];
+};
+
+export type Skill = {
+  id: string;
+  title: string;
+  description: string;
 };

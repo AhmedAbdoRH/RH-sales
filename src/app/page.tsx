@@ -1,6 +1,5 @@
 'use client';
 
-import { salesSkills } from '@/lib/skills';
 import {
   Carousel,
   CarouselContent,
@@ -12,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { CustomerCarousel } from '@/components/customer-carousel';
 import { KnowledgeBaseCarousel } from '@/components/knowledge-base-carousel';
+import { SalesSkillsCarousel } from '@/components/sales-skills-carousel';
 
 export default function DashboardPage() {
   return (
@@ -19,26 +19,7 @@ export default function DashboardPage() {
         {/* Section 1: Top Required Skills */}
         <section>
             <h2 className="text-2xl font-semibold tracking-tight mb-4 text-right">أهم المهارات المطلوبة</h2>
-            <Carousel opts={{ align: 'start', direction: 'rtl' }} className="w-full">
-            <CarouselContent>
-                {salesSkills.map((skill, index) => (
-                <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                    <div className="p-1 h-full">
-                    <Card>
-                        <CardHeader className="p-4">
-                            <CardTitle className="text-base">{skill.title}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-4 pt-0">
-                            <p className="text-sm text-muted-foreground">{skill.description}</p>
-                        </CardContent>
-                    </Card>
-                    </div>
-                </CarouselItem>
-                ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-            </Carousel>
+            <SalesSkillsCarousel />
         </section>
 
         {/* Section 2: Top Customers */}

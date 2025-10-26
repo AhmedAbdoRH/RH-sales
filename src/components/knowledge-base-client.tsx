@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import type { KnowledgeBaseArticle } from '@/lib/types';
 import { Input } from '@/components/ui/input';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search } from 'lucide-react';
+import { Search, Edit, Copy, Check } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import {
   Accordion,
   AccordionContent,
@@ -16,6 +17,21 @@ import {
 
 export function KnowledgeBaseClient({ articles }: { articles: KnowledgeBaseArticle[] }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [copiedItemId, setCopiedItemId] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleCopy = (e: React.MouseEvent, content: string, id: string) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(content);
+    setCopiedItemId(id);
+    toast({ title: "تم النسخ!", description: "تم نسخ محتوى المقال إلى الحافظة." });
+    setTimeout(() => setCopiedItemId(null), 2000);
+  };
+  
+  const handleEdit = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    toast({ title: "ميزة التعديل", description: `سيتم فتح نموذج لتعديل المقال ${id}.` });
+  }
 
   const filteredArticles = articles.filter(article =>
     article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -49,10 +65,22 @@ export function KnowledgeBaseClient({ articles }: { articles: KnowledgeBaseArtic
                 </AccordionTrigger>
                 <AccordionContent className="space-y-2">
                   <p className="text-base">{article.content}</p>
-                  <div className="flex gap-2 pt-2">
-                    {article.tags.map(tag => (
-                      <Badge key={tag} variant="secondary">{tag}</Badge>
-                    ))}
+                  <div className="flex justify-between items-center pt-2">
+                    <div className="flex gap-2">
+                      {article.tags.map(tag => (
+                        <Badge key={tag} variant="secondary">{tag}</Badge>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                        <Button variant="ghost" size="icon" onClick={(e) => handleEdit(e, article.id)}>
+                            <Edit className="h-4 w-4" />
+                            <span className="sr-only">تعديل المحتوى</span>
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={(e) => handleCopy(e, article.content, article.id)}>
+                            {copiedItemId === article.id ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                            <span className="sr-only">نسخ المحتوى</span>
+                        </Button>
+                    </div>
                   </div>
                 </AccordionContent>
               </AccordionItem>

@@ -58,6 +58,27 @@ export function CustomerList({ customers }: { customers: Customer[] }) {
     router.refresh(); 
   };
 
+  const handleEditClick = (e: React.MouseEvent, customerId: string) => {
+    e.stopPropagation();
+    // In a real app, you would navigate to an edit page
+    // or open a modal with the customer's data.
+    toast({
+      title: "ميزة التعديل",
+      description: `سيتم فتح نموذج لتعديل العميل ${customerId}.`,
+    });
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, customerId: string) => {
+    e.stopPropagation();
+    // In a real app, you would show a confirmation dialog
+    // before deleting the customer.
+    toast({
+      title: "ميزة الحذف",
+      description: `سيتم حذف العميل ${customerId}.`,
+      variant: "destructive",
+    });
+  };
+
   return (
     <>
       <div className="flex justify-end">
@@ -142,8 +163,8 @@ export function CustomerList({ customers }: { customers: Customer[] }) {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onSelect={() => router.push(`/customers/${customer.id}`)}>عرض</DropdownMenuItem>
-                        <DropdownMenuItem>تعديل</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">حذف</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={(e) => handleEditClick(e, customer.id)}>تعديل</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive" onSelect={(e) => handleDeleteClick(e, customer.id)}>حذف</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

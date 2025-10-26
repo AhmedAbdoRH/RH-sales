@@ -29,9 +29,9 @@ export function ConcernDashboard({ concerns, customers }: { concerns: Concern[],
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       <Card className="lg:col-span-2">
         <CardHeader>
-          <CardTitle>Top Customer Concerns</CardTitle>
+          <CardTitle>أبرز اهتمامات العملاء</CardTitle>
           <CardDescription>
-            An analysis of the most frequent objections and questions.
+            تحليل للاعتراضات والأسئلة الأكثر شيوعًا.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -41,29 +41,29 @@ export function ConcernDashboard({ concerns, customers }: { concerns: Concern[],
       
       <Card>
         <CardHeader>
-          <CardTitle>Total Concerns</CardTitle>
-          <CardDescription>All concerns logged to date.</CardDescription>
+          <CardTitle>إجمالي الاهتمامات</CardTitle>
+          <CardDescription>جميع الاهتمامات المسجلة حتى الآن.</CardDescription>
         </CardHeader>
         <CardContent className="flex h-full flex-col justify-center">
           <div className="text-5xl font-bold">{concerns.length}</div>
           <p className="mt-2 text-xs text-muted-foreground">
-            across {customers.length} customers
+            لدى {customers.length} عملاء
           </p>
         </CardContent>
       </Card>
 
       <Card className="lg:col-span-3">
         <CardHeader>
-          <CardTitle>Recent Concerns</CardTitle>
+          <CardTitle>الاهتمامات الأخيرة</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Summary</TableHead>
-                <TableHead className="text-right">Date</TableHead>
+                <TableHead>العميل</TableHead>
+                <TableHead>الفئة</TableHead>
+                <TableHead>الملخص</TableHead>
+                <TableHead className="text-right">التاريخ</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

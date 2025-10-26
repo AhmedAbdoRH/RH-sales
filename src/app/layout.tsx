@@ -3,8 +3,8 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { UserCircle, Settings } from 'lucide-react';
-import { Toaster } from '@/components/ui/toaster';
-import { SkillReminder } from '@/components/skill-reminder';
+import Link from 'next/link';
+import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
   title: 'مركز محترفي المبيعات',
@@ -27,48 +27,45 @@ export default function RootLayout({
         />
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased', 'dark')}>
-        <div className="flex w-full flex-col">
-          <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
-            <div className="flex items-center gap-2">
-              <svg
-                className="size-8 shrink-0 text-primary"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12 2L2 7V17L12 22L22 17V7L12 2Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M2 7L12 12M12 22V12M22 7L12 12M17 4.5L7 9.5"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <h2 className="text-lg font-semibold text-foreground tracking-tight">
-                مركز محترفي المبيعات
-              </h2>
-            </div>
-            <div className="flex-1">
-              {/* Future home for breadcrumbs or global search */}
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <Settings className="h-5 w-5" />
-                <span className="sr-only">الإعدادات</span>
-              </Button>
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <UserCircle className="h-5 w-5" />
-                <span className="sr-only">الملف الشخصي</span>
-              </Button>
-            </div>
-          </header>
-          <main className="flex-1 p-4 md:p-6">{children}</main>
-          <SkillReminder />
+        <div className="flex flex-col min-h-screen w-full">
+            <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:h-[60px] lg:px-6">
+                 <Link href="/" className="flex items-center gap-2 font-semibold">
+                     <svg
+                        className="size-8 shrink-0 text-primary"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                        d="M12 2L2 7V17L12 22L22 17V7L12 2Z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinejoin="round"
+                        />
+                        <path
+                        d="M2 7L12 12M12 22V12M22 7L12 12M17 4.5L7 9.5"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinejoin="round"
+                        />
+                    </svg>
+                    <span className="text-lg">مركز المبيعات</span>
+                </Link>
+                <div className="flex-1">
+                    {/* Future home for breadcrumbs or global search */}
+                </div>
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" className="rounded-full">
+                        <Settings className="h-5 w-5" />
+                        <span className="sr-only">الإعدادات</span>
+                    </Button>
+                    <Button variant="ghost" size="icon" className="rounded-full">
+                        <UserCircle className="h-5 w-5" />
+                        <span className="sr-only">الملف الشخصي</span>
+                    </Button>
+                </div>
+            </header>
+            <main className="flex-1 p-4 md:p-6">{children}</main>
         </div>
         <Toaster />
       </body>

@@ -33,30 +33,35 @@ export function FloatingAddButton() {
 
   return (
     <TooltipProvider>
-      <div className="fixed bottom-8 left-8 z-50">
-        <div className="relative flex flex-col-reverse items-center gap-2">
+      <div className="fixed bottom-6 left-6 z-50">
+        <div className="relative flex flex-col items-center gap-2">
             {menuItems.map((item, index) => (
-                <Tooltip key={item.label} delayDuration={0}>
-                    <TooltipTrigger asChild>
-                         <Button
-                            size="icon"
-                            className={cn(
-                                "rounded-full w-12 h-12 bg-secondary text-secondary-foreground shadow-lg transition-all duration-300 ease-in-out hover:bg-secondary/80",
-                                isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-                            )}
-                            style={{
-                                transform: isOpen ? `translateY(-${(index + 1) * 3.5}rem)` : 'translateY(0)',
-                                transitionDelay: isOpen ? `${index * 50}ms` : '0ms',
-                            }}
-                            onClick={item.action}
-                        >
-                            <item.icon className="h-5 w-5" />
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="left">
-                        <p>إضافة {item.label}</p>
-                    </TooltipContent>
-                </Tooltip>
+                <div
+                    key={item.label}
+                    className={cn(
+                        "transition-all duration-300 ease-in-out",
+                        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                    )}
+                    style={{
+                        transform: isOpen ? `translateY(-${(index + 1) * 3.75}rem)` : 'translateY(0)',
+                        transitionDelay: isOpen ? `${index * 50}ms` : `${(menuItems.length - index -1) * 30}ms`,
+                    }}
+                >
+                    <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                             <Button
+                                size="icon"
+                                className="rounded-full w-12 h-12 bg-secondary text-secondary-foreground shadow-lg hover:bg-secondary/80"
+                                onClick={item.action}
+                            >
+                                <item.icon className="h-5 w-5" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="left">
+                            <p>إضافة {item.label}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
             ))}
 
 

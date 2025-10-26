@@ -44,6 +44,7 @@ export function FloatingAddButton() {
     const formData = new FormData(event.currentTarget);
     
     const name = formData.get('name') as string;
+    const generalInfo = formData.get('generalInfo') as string;
 
     if (!firestore || !name) {
         toast({
@@ -54,7 +55,7 @@ export function FloatingAddButton() {
         return;
     }
     
-    addCustomer(firestore, { name });
+    addCustomer(firestore, { name, generalInfo });
     
     setOpenDialog(null);
     toast({
@@ -169,13 +170,17 @@ export function FloatingAddButton() {
               <DialogHeader>
                 <DialogTitle>إضافة عميل جديد</DialogTitle>
                 <DialogDescription>
-                  اكتب اسم العميل الجديد. انقر على "حفظ" عند الانتهاء.
+                  اكتب اسم العميل والمعلومات العامة. انقر على "حفظ" عند الانتهاء.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="name" className="text-right">الاسم</Label>
                   <Input id="name" name="name" className="col-span-3" required />
+                </div>
+                <div className="grid grid-cols-4 items-start gap-4">
+                  <Label htmlFor="generalInfo" className="text-right pt-2">معلومات عامة</Label>
+                  <Textarea id="generalInfo" name="generalInfo" className="col-span-3" />
                 </div>
               </div>
               <DialogFooter>

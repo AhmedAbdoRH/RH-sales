@@ -36,6 +36,7 @@ import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebas
 import { collection } from 'firebase/firestore';
 import { addCustomer } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from './ui/textarea';
 
 export function CustomerList() {
   const router = useRouter();
@@ -56,6 +57,7 @@ export function CustomerList() {
     const formData = new FormData(event.currentTarget);
     
     const name = formData.get('name') as string;
+    const generalInfo = formData.get('generalInfo') as string;
 
     if (!firestore || !name) {
         toast({
@@ -66,7 +68,7 @@ export function CustomerList() {
         return;
     }
     
-    addCustomer(firestore, { name });
+    addCustomer(firestore, { name, generalInfo });
     
     setOpenAddDialog(false);
     
@@ -117,7 +119,7 @@ export function CustomerList() {
               <DialogHeader>
                 <DialogTitle>إضافة عميل جديد</DialogTitle>
                 <DialogDescription>
-                  اكتب اسم العميل الجديد. انقر على "حفظ" عند الانتهاء.
+                  اكتب اسم العميل والمعلومات العامة. انقر على "حفظ" عند الانتهاء.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
@@ -126,6 +128,12 @@ export function CustomerList() {
                     الاسم
                   </Label>
                   <Input id="name" name="name" className="col-span-3" required />
+                </div>
+                 <div className="grid grid-cols-4 items-start gap-4">
+                  <Label htmlFor="generalInfo" className="text-right pt-2">
+                    معلومات عامة
+                  </Label>
+                  <Textarea id="generalInfo" name="generalInfo" className="col-span-3" />
                 </div>
               </div>
               <DialogFooter>

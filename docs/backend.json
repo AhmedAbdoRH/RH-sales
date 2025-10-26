@@ -30,6 +30,10 @@
         "addedDate": {
           "type": "string",
           "format": "date-time"
+        },
+        "generalInfo": {
+          "type": "string",
+          "description": "General information about the customer."
         }
       },
       "required": [

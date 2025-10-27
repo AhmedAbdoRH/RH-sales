@@ -74,15 +74,18 @@ export function KnowledgeBaseCarousel() {
     const formData = new FormData(event.currentTarget);
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
-    const category = formData.get('category') as string;
-    const tags = (formData.get('tags') as string).split(',').map(tag => tag.trim()).filter(Boolean);
-
+    
     if (!title || !content) {
         toast({ title: "خطأ", description: "العنوان والمحتوى مطلوبان.", variant: "destructive" });
         return;
     }
     
-    updateKnowledgeBaseArticle(firestore, selectedArticle.id, { title, content, category, tags });
+    updateKnowledgeBaseArticle(firestore, selectedArticle.id, { 
+      title, 
+      content,
+      category: selectedArticle.category,
+      tags: selectedArticle.tags,
+    });
     toast({ title: "تم تحديث المعلومة", description: `تم تحديث "${title}".` });
     
     setEditDialogOpen(false);
@@ -165,14 +168,6 @@ export function KnowledgeBaseCarousel() {
                 <div className="grid grid-cols-4 items-start gap-4">
                     <Label htmlFor="content" className="text-right pt-2">المحتوى</Label>
                     <Textarea id="content" name="content" defaultValue={selectedArticle?.content} className="col-span-3" required/>
-                </div>
-                 <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="category" className="text-right">الفئة</Label>
-                    <Input id="category" name="category" defaultValue={selectedArticle?.category} className="col-span-3" />
-                </div>
-                 <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="tags" className="text-right">الوسوم</Label>
-                    <Input id="tags" name="tags" defaultValue={selectedArticle?.tags.join(', ')} className="col-span-3" />
                 </div>
                 </div>
                 <DialogFooter>

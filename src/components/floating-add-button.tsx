@@ -17,7 +17,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -48,6 +47,7 @@ export function FloatingAddButton() {
     const generalInfo = formData.get('generalInfo') as string;
     const needs = formData.get('needs') as string;
     const customerConcerns = formData.get('customerConcerns') as string;
+    const bestTimeToContact = formData.get('bestTimeToContact') as string;
 
     if (!firestore || !name) {
         toast({
@@ -58,7 +58,7 @@ export function FloatingAddButton() {
         return;
     }
     
-    addCustomer(firestore, { name, phone, generalInfo, needs, customerConcerns });
+    addCustomer(firestore, { name, phone, generalInfo, needs, customerConcerns, bestTimeToContact });
     
     setOpenDialog(null);
     toast({
@@ -188,6 +188,12 @@ export function FloatingAddButton() {
                     رقم الهاتف
                   </Label>
                   <Input id="phone" name="phone" className="col-span-3" />
+                </div>
+                 <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="bestTimeToContact" className="text-right">
+                    وقت التواصل
+                  </Label>
+                  <Input id="bestTimeToContact" name="bestTimeToContact" className="col-span-3" placeholder="مثال: بعد 5 مساءً" />
                 </div>
                 <div className="grid grid-cols-4 items-start gap-4">
                   <Label htmlFor="generalInfo" className="text-right pt-2">

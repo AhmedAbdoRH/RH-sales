@@ -38,6 +38,7 @@ export const addCustomer = async (firestore: Firestore, customer: Partial<Omit<C
     customerConcerns: customer.customerConcerns || '',
     addedDate: Timestamp.now(),
     displayOrder: currentCount,
+    bestTimeToContact: customer.bestTimeToContact || '',
   }
   addDocumentNonBlocking(customerCollection, newCustomer);
 };

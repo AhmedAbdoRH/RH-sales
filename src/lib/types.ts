@@ -10,6 +10,7 @@ export type Customer = {
   customerConcerns?: string;
   addedDate: any; // Can be a string or a Firestore Timestamp
   displayOrder?: number;
+  bestTimeToContact?: string;
 };
 
 export type Concern = {

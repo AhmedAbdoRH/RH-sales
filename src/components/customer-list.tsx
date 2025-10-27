@@ -42,7 +42,7 @@ const BulletPoints = ({ text }: { text: string | undefined }) => {
   if (!text) return null;
   const points = text.split('\n');
   return (
-    <ul className="list-disc list-inside text-sm text-card-foreground/90 space-y-1">
+    <ul className="list-disc list-inside text-card-foreground space-y-1">
       {points.map((point, index) => (
         <li key={index}>{point}</li>
       ))}
@@ -78,6 +78,7 @@ export function CustomerList() {
     const generalInfo = formData.get('generalInfo') as string;
     const needs = formData.get('needs') as string;
     const customerConcerns = formData.get('customerConcerns') as string;
+    const bestTimeToContact = formData.get('bestTimeToContact') as string;
 
     if (!name) {
         toast({ title: "خطأ", description: "الاسم مطلوب.", variant: "destructive" });
@@ -85,10 +86,10 @@ export function CustomerList() {
     }
     
     if (dialogMode === 'edit' && selectedCustomer) {
-      updateCustomer(firestore, selectedCustomer.id, { name, phone, generalInfo, needs, customerConcerns });
+      updateCustomer(firestore, selectedCustomer.id, { name, phone, generalInfo, needs, customerConcerns, bestTimeToContact });
       toast({ title: "تم تحديث العميل", description: `تم تحديث بيانات ${name}.` });
     } else {
-      addCustomer(firestore, { name, phone, generalInfo, needs, customerConcerns });
+      addCustomer(firestore, { name, phone, generalInfo, needs, customerConcerns, bestTimeToContact });
       toast({ title: "تمت إضافة العميل", description: `تمت إضافة ${name} إلى قاعدة بياناتك.` });
     }
     
@@ -194,13 +195,18 @@ export function CustomerList() {
               )}
             </CardContent>
             {customer.phone && (
-                <CardFooter>
+                <CardFooter className="flex-col items-stretch">
                     <Button variant="outline" size="sm" className="w-full" asChild>
                         <a href={`tel:${customer.phone}`}>
                             <Phone className="ml-2 h-4 w-4" />
                             اتصال
                         </a>
                     </Button>
+                    {customer.bestTimeToContact && (
+                        <p className="text-center text-xs text-muted-foreground mt-2">
+                            {customer.bestTimeToContact}
+                        </p>
+                    )}
                 </CardFooter>
             )}
           </Card>
@@ -224,6 +230,10 @@ export function CustomerList() {
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="phone" className="text-right">رقم الهاتف</Label>
                 <Input id="phone" name="phone" defaultValue={selectedCustomer?.phone} className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="bestTimeToContact" className="text-right">وقت التواصل</Label>
+                <Input id="bestTimeToContact" name="bestTimeToContact" defaultValue={selectedCustomer?.bestTimeToContact} className="col-span-3" placeholder="مثال: بعد 5 مساءً"/>
               </div>
               <div className="grid grid-cols-4 items-start gap-4">
                 <Label htmlFor="generalInfo" className="text-right pt-2">معلومات</Label>

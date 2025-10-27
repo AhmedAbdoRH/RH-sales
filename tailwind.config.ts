@@ -60,6 +60,9 @@ export default {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
+        'info-title': '#a5d8ff', // light blue
+        'needs-title': '#b2f2bb', // light green
+        'concerns-title': '#ffc9c9', // light red
       },
       borderRadius: {
         lg: 'var(--radius)',

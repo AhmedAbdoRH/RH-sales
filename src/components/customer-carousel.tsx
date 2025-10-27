@@ -41,9 +41,9 @@ const cardColors = [
 
 const BulletPoints = ({ text }: { text: string | undefined }) => {
   if (!text) return null;
-  const points = text.split('\n').filter(p => p.trim() !== '');
+  const points = text.split('\n');
   return (
-    <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+    <ul className="list-disc list-inside text-sm text-card-foreground/90 space-y-1">
       {points.map((point, index) => (
         <li key={index}>{point}</li>
       ))}
@@ -167,19 +167,19 @@ export function CustomerCarousel() {
                     <CardContent className="flex-grow space-y-3 p-6 pt-0">
                       {customer.generalInfo && (
                         <div>
-                          <h4 className="text-sm font-semibold mb-1">معلومات</h4>
+                          <h4 className="text-sm font-semibold mb-1 text-info-title">معلومات</h4>
                           <BulletPoints text={customer.generalInfo} />
                         </div>
                       )}
                       {customer.needs && (
                          <div>
-                          <h4 className="text-sm font-semibold mb-1">الاحتياجات</h4>
+                          <h4 className="text-sm font-semibold mb-1 text-needs-title">الاحتياجات</h4>
                           <BulletPoints text={customer.needs} />
                         </div>
                       )}
                       {customer.customerConcerns && (
                         <div>
-                          <h4 className="text-sm font-semibold mb-1">المخاوف</h4>
+                          <h4 className="text-sm font-semibold mb-1 text-concerns-title">المخاوف</h4>
                           <BulletPoints text={customer.customerConcerns} />
                         </div>
                       )}

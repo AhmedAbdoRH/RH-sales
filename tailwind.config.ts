@@ -20,11 +20,11 @@ export default {
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
-          blue: '#030f1e', // Darker Blue
-          purple: '#0f081c', // Darker Purple
-          green: '#071712', // Darker Green
-          orange: '#1e1008', // Darker Orange
-          pink: '#1c0812', // Darker Pink
+          blue: '#030f1e',
+          purple: '#0f081c',
+          green: '#071712',
+          orange: '#1e1008',
+          pink: '#1c0812',
         },
         popover: {
           DEFAULT: 'hsl(var(--popover))',
@@ -60,9 +60,9 @@ export default {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
-        'info-title': '#a5d8ff', // light blue
-        'needs-title': '#b2f2bb', // light green
-        'concerns-title': '#ffc9c9', // light red
+        'info-title': '#5883a3',
+        'needs-title': '#5f9967',
+        'concerns-title': '#a36a6a',
       },
       borderRadius: {
         lg: 'var(--radius)',

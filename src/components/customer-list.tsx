@@ -41,9 +41,6 @@ import { Textarea } from './ui/textarea';
 const BulletPoints = ({ text }: { text: string | undefined }) => {
   if (!text) return null;
   const points = text.split('\n').filter(p => p.trim() !== '');
-  if (points.length <= 1) {
-    return <p className="text-sm text-muted-foreground whitespace-pre-wrap">{text}</p>;
-  }
   return (
     <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
       {points.map((point, index) => (

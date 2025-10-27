@@ -216,7 +216,7 @@ export function FloatingAddButton() {
                 </div>
                  <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="bestTimeToContact" className="text-right">
-                    الحالة
+                    الحالة والوقت المناسب
                   </Label>
                   <Input id="bestTimeToContact" name="bestTimeToContact" className="col-span-3" placeholder="مثال: مهتم، يحتاج متابعة" />
                 </div>

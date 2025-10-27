@@ -254,7 +254,7 @@ export function CustomerList() {
                     </div>}
                     {customer.bestTimeToContact && (
                         <p className="text-center text-xs text-muted-foreground mt-2">
-                           <span className="font-bold">الحالة:</span> {customer.bestTimeToContact}
+                           {customer.bestTimeToContact}
                         </p>
                     )}
                 </CardFooter>
@@ -298,7 +298,7 @@ export function CustomerList() {
                 <Input id="phone" name="phone" defaultValue={selectedCustomer?.phone} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="bestTimeToContact" className="text-right">الحالة</Label>
+                <Label htmlFor="bestTimeToContact" className="text-right">الحالة والوقت المناسب</Label>
                 <Input id="bestTimeToContact" name="bestTimeToContact" defaultValue={selectedCustomer?.bestTimeToContact} className="col-span-3" placeholder="مثال: مهتم، يحتاج متابعة"/>
               </div>
             </div>

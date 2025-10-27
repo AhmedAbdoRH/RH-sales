@@ -159,7 +159,7 @@ export const deleteKnowledgeBaseArticle = async (firestore: Firestore, articleId
 };
 
 export const moveKnowledgeBaseArticle = async (firestore: Firestore, articles: KnowledgeBaseArticle[], articleId: string, direction: 'left' | 'right') => {
-  const sorted = articles.sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity));
+  const sorted = [...articles].sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity));
   const currentIndex = sorted.findIndex(a => a.id === articleId);
 
   if (currentIndex === -1) return;

@@ -169,6 +169,7 @@ export function CustomerList() {
         )}
         {!showLoading && sortedCustomers.map((customer) => {
           const score = customer.convictionScore ?? 1;
+          const cleanPhoneNumber = customer.phone?.replace(/\D/g, '');
           return (
           <Card key={customer.id} className="flex flex-col">
             <CardHeader className="flex flex-row items-start justify-between">
@@ -239,7 +240,7 @@ export function CustomerList() {
                 <CardFooter className="flex-col items-stretch">
                      <div className="flex w-full gap-2">
                         <Button variant="outline" size="sm" className="flex-1" asChild>
-                            <a href={`https://wa.me/${customer.phone.replace(/\+/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+                            <a href={`https://wa.me/${cleanPhoneNumber}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
                                 <WhatsappIcon className="h-4 w-4" />
                                 واتساب
                             </a>

@@ -151,6 +151,7 @@ export function CustomerCarousel() {
         <CarouselContent>
           {sortedCustomers?.map((customer, idx) => {
             const score = customer.convictionScore ?? 1;
+            const cleanPhoneNumber = customer.phone?.replace(/\D/g, '');
             return (
               <CarouselItem key={customer.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
                 <div className="p-1 h-full">
@@ -226,7 +227,7 @@ export function CustomerCarousel() {
                           <CardFooter className="pt-0 flex-col items-stretch">
                                <div className="flex w-full gap-2">
                                   <Button variant="outline" size="sm" className="flex-1" asChild>
-                                      <a href={`https://wa.me/${customer.phone.replace(/\+/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+                                      <a href={`https://wa.me/${cleanPhoneNumber}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
                                           <WhatsappIcon className="h-4 w-4" />
                                           واتساب
                                       </a>

@@ -191,7 +191,7 @@ export function FloatingAddButton() {
                 </div>
                 <div className="grid grid-cols-4 items-start gap-4">
                   <Label htmlFor="generalInfo" className="text-right pt-2">
-                    معلومات عامة
+                    معلومات
                   </Label>
                   <Textarea id="generalInfo" name="generalInfo" className="col-span-3" />
                 </div>

@@ -38,6 +38,22 @@ import { addCustomer, deleteCustomer, updateCustomer } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from './ui/textarea';
 
+const BulletPoints = ({ text }: { text: string | undefined }) => {
+  if (!text) return null;
+  const points = text.split('\n').filter(p => p.trim() !== '');
+  if (points.length <= 1) {
+    return <p className="text-sm text-muted-foreground whitespace-pre-wrap">{text}</p>;
+  }
+  return (
+    <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+      {points.map((point, index) => (
+        <li key={index}>{point}</li>
+      ))}
+    </ul>
+  );
+};
+
+
 export function CustomerList() {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -163,20 +179,20 @@ export function CustomerList() {
             <CardContent className="flex-grow space-y-4 cursor-pointer" onClick={(e) => handleEditClick(e, customer)}>
               {customer.generalInfo && (
                 <div>
-                  <h4 className="text-sm font-semibold mb-1">معلومات عامة</h4>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{customer.generalInfo}</p>
+                  <h4 className="text-sm font-semibold mb-1">معلومات</h4>
+                  <BulletPoints text={customer.generalInfo} />
                 </div>
               )}
               {customer.needs && (
                  <div>
                   <h4 className="text-sm font-semibold mb-1">الاحتياجات</h4>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{customer.needs}</p>
+                  <BulletPoints text={customer.needs} />
                 </div>
               )}
               {customer.customerConcerns && (
                 <div>
                   <h4 className="text-sm font-semibold mb-1">المخاوف</h4>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{customer.customerConcerns}</p>
+                  <BulletPoints text={customer.customerConcerns} />
                 </div>
               )}
             </CardContent>
@@ -213,7 +229,7 @@ export function CustomerList() {
                 <Input id="phone" name="phone" defaultValue={selectedCustomer?.phone} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-start gap-4">
-                <Label htmlFor="generalInfo" className="text-right pt-2">معلومات عامة</Label>
+                <Label htmlFor="generalInfo" className="text-right pt-2">معلومات</Label>
                 <Textarea id="generalInfo" name="generalInfo" defaultValue={selectedCustomer?.generalInfo} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-start gap-4">

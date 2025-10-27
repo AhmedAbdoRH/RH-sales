@@ -28,12 +28,14 @@ export type KnowledgeBaseArticle = {
   category: string;
   content: string;
   tags: string[];
+  displayOrder?: number;
 };
 
 export type Skill = {
   id: string;
   title: string;
   description: string;
+  displayOrder?: number;
 };
 
     

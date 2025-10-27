@@ -3,7 +3,7 @@
 import type { KnowledgeBaseArticle } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Copy, Check, Pencil, Trash2 } from 'lucide-react';
+import { Copy, Check, Pencil, Trash2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -11,9 +11,12 @@ type KnowledgeBaseCardProps = {
   article: KnowledgeBaseArticle;
   onEdit: (article: KnowledgeBaseArticle) => void;
   onDelete: (articleId: string) => void;
+  onMove: (articleId: string, direction: 'left' | 'right') => void;
+  isFirst: boolean;
+  isLast: boolean;
 };
 
-export function KnowledgeBaseCard({ article, onEdit, onDelete }: KnowledgeBaseCardProps) {
+export function KnowledgeBaseCard({ article, onEdit, onDelete, onMove, isFirst, isLast }: KnowledgeBaseCardProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
@@ -40,6 +43,14 @@ export function KnowledgeBaseCard({ article, onEdit, onDelete }: KnowledgeBaseCa
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-base font-medium">{article.title}</CardTitle>
         <div className="flex items-center">
+             <Button variant="ghost" size="icon" onClick={() => onMove(article.id, 'right')} disabled={isFirst}>
+                <ArrowRight className="h-4 w-4" />
+                <span className="sr-only">تحريك لليمين</span>
+              </Button>
+               <Button variant="ghost" size="icon" onClick={() => onMove(article.id, 'left')} disabled={isLast}>
+                <ArrowLeft className="h-4 w-4" />
+                <span className="sr-only">تحريك لليسار</span>
+              </Button>
             <Button variant="ghost" size="icon" onClick={handleCopy}>
                 {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                 <span className="sr-only">نسخ المحتوى</span>

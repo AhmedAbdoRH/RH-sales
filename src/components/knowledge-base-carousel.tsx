@@ -10,7 +10,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Skeleton } from './ui/skeleton';
-import { collection, limit, query } from 'firebase/firestore';
+import { collection, query } from 'firebase/firestore';
 import type { KnowledgeBaseArticle } from '@/lib/types';
 import { KnowledgeBaseCard } from './knowledge-base-card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
@@ -20,7 +20,7 @@ import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { deleteKnowledgeBaseArticle, updateKnowledgeBaseArticle } from '@/lib/data';
+import { deleteKnowledgeBaseArticle, updateKnowledgeBaseArticle, moveKnowledgeBaseArticle } from '@/lib/data';
 
 
 export function KnowledgeBaseCarousel() {
@@ -34,7 +34,7 @@ export function KnowledgeBaseCarousel() {
 
   const articlesQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return query(collection(firestore, 'knowledge_base_articles'), limit(5));
+    return query(collection(firestore, 'knowledge_base_articles'));
   }, [firestore, user]);
 
   const { data: articles, isLoading } = useCollection<KnowledgeBaseArticle>(articlesQuery);
@@ -49,8 +49,8 @@ export function KnowledgeBaseCarousel() {
   };
   
   const handleConfirmDelete = () => {
-    if (firestore && articleToDelete) {
-      deleteKnowledgeBaseArticle(firestore, articleToDelete);
+    if (firestore && articleToDelete && sortedArticles) {
+      deleteKnowledgeBaseArticle(firestore, articleToDelete, sortedArticles);
       toast({
         title: "تم حذف المعلومة",
         description: "تم حذف المعلومة بنجاح.",
@@ -81,6 +81,12 @@ export function KnowledgeBaseCarousel() {
     setSelectedArticle(null);
   };
 
+  const handleMove = (articleId: string, direction: 'left' | 'right') => {
+    if (firestore && sortedArticles) {
+       moveKnowledgeBaseArticle(firestore, sortedArticles, articleId, direction);
+    }
+  };
+
   if (isLoading || isUserLoading) {
     return (
       <div className="flex space-x-4 rtl:space-x-reverse">
@@ -91,17 +97,24 @@ export function KnowledgeBaseCarousel() {
     );
   }
   
+  const sortedArticles = articles 
+    ? [...articles].sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity))
+    : [];
+
   return (
     <>
         <Carousel opts={{ align: 'start', direction: 'rtl' }} className="w-full">
         <CarouselContent>
-            {articles?.map((article) => (
+            {sortedArticles?.map((article, idx) => (
             <CarouselItem key={article.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
                 <div className="p-1 h-full">
                 <KnowledgeBaseCard 
                     article={article} 
                     onEdit={handleEditClick} 
-                    onDelete={handleDeleteClick} 
+                    onDelete={handleDeleteClick}
+                    onMove={handleMove}
+                    isFirst={idx === 0}
+                    isLast={idx === sortedArticles.length - 1}
                 />
                 </div>
             </CarouselItem>

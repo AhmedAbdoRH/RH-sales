@@ -113,13 +113,17 @@ export const addConcern = (firestore: Firestore, customerId: string, concernText
     addDocumentNonBlocking(concernsCollection, newConcern);
 };
 
-export const addKnowledgeBaseArticle = (firestore: Firestore, article: Partial<Omit<KnowledgeBaseArticle, 'id'>>) => {
+export const addKnowledgeBaseArticle = async (firestore: Firestore, article: Partial<Omit<KnowledgeBaseArticle, 'id'>>) => {
   const articleCollection = collection(firestore, 'knowledge_base_articles');
+  const snapshot = await getDocs(articleCollection);
+  const currentCount = snapshot.size;
+
   const newArticle = {
     title: article.title || 'بدون عنوان',
     content: article.content || '',
     category: article.category || 'عام',
-    tags: article.tags || []
+    tags: article.tags || [],
+    displayOrder: currentCount,
   };
   addDocumentNonBlocking(articleCollection, newArticle);
 };
@@ -129,15 +133,54 @@ export const updateKnowledgeBaseArticle = (firestore: Firestore, articleId: stri
     updateDocumentNonBlocking(articleDoc, data);
 };
 
-export const deleteKnowledgeBaseArticle = (firestore: Firestore, articleId: string) => {
+export const deleteKnowledgeBaseArticle = async (firestore: Firestore, articleId: string, articles?: KnowledgeBaseArticle[]) => {
     const articleDoc = doc(firestore, 'knowledge_base_articles', articleId);
-    deleteDocumentNonBlocking(articleDoc);
+    await deleteDoc(articleDoc);
+
+    if (articles) {
+        const remaining = articles.filter(a => a.id !== articleId).sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity));
+        const batch = writeBatch(firestore);
+        remaining.forEach((article, index) => {
+            const docRef = doc(firestore, 'knowledge_base_articles', article.id);
+            batch.update(docRef, { displayOrder: index });
+        });
+        await batch.commit();
+    }
 };
 
+export const moveKnowledgeBaseArticle = async (firestore: Firestore, articles: KnowledgeBaseArticle[], articleId: string, direction: 'left' | 'right') => {
+  const sorted = articles.sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity));
+  const currentIndex = sorted.findIndex(a => a.id === articleId);
 
-export const addSkill = (firestore: Firestore, skill: Omit<Skill, 'id'>) => {
+  if (currentIndex === -1) return;
+  const newIndex = direction === 'left' ? currentIndex + 1 : currentIndex - 1; // RTL
+  if (newIndex < 0 || newIndex >= sorted.length) return;
+
+  const articleToMove = sorted[currentIndex];
+  const otherArticle = sorted[newIndex];
+
+  if (!articleToMove || !otherArticle) return;
+
+  const batch = writeBatch(firestore);
+  const orderToMove = articleToMove.displayOrder ?? currentIndex;
+  const orderToSwap = otherArticle.displayOrder ?? newIndex;
+
+  batch.update(doc(firestore, 'knowledge_base_articles', articleToMove.id), { displayOrder: orderToSwap });
+  batch.update(doc(firestore, 'knowledge_base_articles', otherArticle.id), { displayOrder: orderToMove });
+
+  await batch.commit();
+};
+
+export const addSkill = async (firestore: Firestore, skill: Omit<Skill, 'id'>) => {
   const skillCollection = collection(firestore, 'skills');
-  addDocumentNonBlocking(skillCollection, skill);
+  const snapshot = await getDocs(skillCollection);
+  const currentCount = snapshot.size;
+
+  const newSkill = {
+      ...skill,
+      displayOrder: currentCount
+  }
+  addDocumentNonBlocking(skillCollection, newSkill);
 };
 
 export const updateSkill = (firestore: Firestore, skillId: string, data: Partial<Omit<Skill, 'id'>>) => {
@@ -145,7 +188,40 @@ export const updateSkill = (firestore: Firestore, skillId: string, data: Partial
     updateDocumentNonBlocking(skillDoc, data);
 };
 
-export const deleteSkill = (firestore: Firestore, skillId: string) => {
+export const deleteSkill = async (firestore: Firestore, skillId: string, skills?: Skill[]) => {
     const skillDoc = doc(firestore, 'skills', skillId);
-    deleteDocumentNonBlocking(skillDoc);
+    await deleteDoc(skillDoc);
+
+    if (skills) {
+        const remaining = skills.filter(s => s.id !== skillId).sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity));
+        const batch = writeBatch(firestore);
+        remaining.forEach((skill, index) => {
+            const docRef = doc(firestore, 'skills', skill.id);
+            batch.update(docRef, { displayOrder: index });
+        });
+        await batch.commit();
+    }
+};
+
+export const moveSkill = async (firestore: Firestore, skills: Skill[], skillId: string, direction: 'left' | 'right') => {
+  const sorted = skills.sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity));
+  const currentIndex = sorted.findIndex(s => s.id === skillId);
+
+  if (currentIndex === -1) return;
+  const newIndex = direction === 'left' ? currentIndex + 1 : currentIndex - 1; // RTL
+  if (newIndex < 0 || newIndex >= sorted.length) return;
+
+  const skillToMove = sorted[currentIndex];
+  const otherSkill = sorted[newIndex];
+
+  if (!skillToMove || !otherSkill) return;
+
+  const batch = writeBatch(firestore);
+  const orderToMove = skillToMove.displayOrder ?? currentIndex;
+  const orderToSwap = otherSkill.displayOrder ?? newIndex;
+
+  batch.update(doc(firestore, 'skills', skillToMove.id), { displayOrder: orderToSwap });
+  batch.update(doc(firestore, 'skills', otherSkill.id), { displayOrder: orderToMove });
+
+  await batch.commit();
 };

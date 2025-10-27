@@ -14,9 +14,9 @@ import { collection, query } from 'firebase/firestore';
 import { Skeleton } from './ui/skeleton';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { deleteSkill, updateSkill } from '@/lib/data';
+import { deleteSkill, updateSkill, moveSkill } from '@/lib/data';
 import { Button } from './ui/button';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 import { Label } from './ui/label';
@@ -51,8 +51,8 @@ export function SalesSkillsCarousel() {
   };
   
   const handleConfirmDelete = () => {
-    if (firestore && skillToDelete) {
-      deleteSkill(firestore, skillToDelete);
+    if (firestore && skillToDelete && sortedSkills) {
+      deleteSkill(firestore, skillToDelete, sortedSkills);
       toast({
         title: "تم حذف المهارة",
       });
@@ -80,6 +80,11 @@ export function SalesSkillsCarousel() {
     setSelectedSkill(null);
   };
 
+  const handleMove = (skillId: string, direction: 'left' | 'right') => {
+    if (firestore && sortedSkills) {
+       moveSkill(firestore, sortedSkills, skillId, direction);
+    }
+  };
 
   if (isLoading || isUserLoading) {
     return (
@@ -91,17 +96,29 @@ export function SalesSkillsCarousel() {
     );
   }
 
+  const sortedSkills = skills 
+    ? [...skills].sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity))
+    : [];
+
   return (
     <>
         <Carousel opts={{ align: 'start', direction: 'rtl' }} className="w-full">
         <CarouselContent>
-            {skills?.map((skill) => (
+            {sortedSkills?.map((skill, idx) => (
             <CarouselItem key={skill.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
                 <div className="p-1 h-full">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
                         <CardTitle className="text-base font-medium">{skill.title}</CardTitle>
                         <div className="flex items-center">
+                             <Button variant="ghost" size="icon" onClick={() => handleMove(skill.id, 'right')} disabled={idx === 0}>
+                                <ArrowRight className="h-4 w-4" />
+                                <span className="sr-only">تحريك لليمين</span>
+                              </Button>
+                               <Button variant="ghost" size="icon" onClick={() => handleMove(skill.id, 'left')} disabled={idx === sortedSkills.length - 1}>
+                                <ArrowLeft className="h-4 w-4" />
+                                <span className="sr-only">تحريك لليسار</span>
+                              </Button>
                             <Button variant="ghost" size="icon" onClick={(e) => handleEditClick(e, skill)}>
                                 <Pencil className="h-4 w-4" />
                                 <span className="sr-only">تعديل</span>

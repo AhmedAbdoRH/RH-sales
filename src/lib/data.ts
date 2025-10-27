@@ -168,18 +168,17 @@ export const moveKnowledgeBaseArticle = async (firestore: Firestore, articles: K
   
   if (newIndex < 0 || newIndex >= sorted.length) return; // Already at an end
 
-  const articleToMove = sorted[currentIndex];
-  const otherArticle = sorted[newIndex];
+  // Create a new array with the moved item
+  const newSortedList = Array.from(sorted);
+  const [movedItem] = newSortedList.splice(currentIndex, 1);
+  newSortedList.splice(newIndex, 0, movedItem);
 
-  if (!articleToMove || !otherArticle) return;
-  
-  // Directly swap their displayOrder values
-  const orderToMove = articleToMove.displayOrder ?? currentIndex;
-  const orderToSwap = otherArticle.displayOrder ?? newIndex;
-
+  // Now, update the displayOrder for all items in the new list
   const batch = writeBatch(firestore);
-  batch.update(doc(firestore, 'knowledge_base_articles', articleToMove.id), { displayOrder: orderToSwap });
-  batch.update(doc(firestore, 'knowledge_base_articles', otherArticle.id), { displayOrder: orderToMove });
+  newSortedList.forEach((article, index) => {
+    const docRef = doc(firestore, 'knowledge_base_articles', article.id);
+    batch.update(docRef, { displayOrder: index });
+  });
 
   await batch.commit();
 };

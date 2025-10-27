@@ -19,7 +19,13 @@ export default function DashboardPage() {
             <CustomerCarousel />
         </section>
 
-        {/* Section 2: Top Responses (Knowledge Base) */}
+        {/* Section 2: Top Required Skills */}
+        <section>
+            <h2 className="text-2xl font-semibold tracking-tight mb-4 text-right">اهم المهارات والخبرات</h2>
+            <SalesSkillsList />
+        </section>
+
+        {/* Section 3: Top Responses (Knowledge Base) */}
         <section>
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold tracking-tight text-right">اهم الردود</h2>
@@ -28,12 +34,6 @@ export default function DashboardPage() {
                 </Link>
             </div>
             <KnowledgeBaseCarousel />
-        </section>
-
-        {/* Section 3: Top Required Skills */}
-        <section>
-            <h2 className="text-2xl font-semibold tracking-tight mb-4 text-right">اهم المهارات والخبرات</h2>
-            <SalesSkillsList />
         </section>
     </div>
   );

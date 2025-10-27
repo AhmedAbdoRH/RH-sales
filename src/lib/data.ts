@@ -138,7 +138,7 @@ export const addKnowledgeBaseArticle = async (firestore: Firestore, article: Par
   addDocumentNonBlocking(articleCollection, newArticle);
 };
 
-export const updateKnowledgeBaseArticle = (firestore: Firestore, articleId: string, data: Partial<Omit<KnowledgeBaseArticle, 'id'>>) => {
+export const updateKnowledgeBaseArticle = (firestore: Firestore, articleId: string, data: Partial<Omit<KnowledgeBaseArticle, 'id' | 'displayOrder'>>) => {
     const articleDoc = doc(firestore, 'knowledge_base_articles', articleId);
     updateDocumentNonBlocking(articleDoc, data);
 };
@@ -163,18 +163,21 @@ export const moveKnowledgeBaseArticle = async (firestore: Firestore, articles: K
   const currentIndex = sorted.findIndex(a => a.id === articleId);
 
   if (currentIndex === -1) return;
-  const newIndex = direction === 'right' ? currentIndex - 1 : currentIndex + 1; // RTL fix
-  if (newIndex < 0 || newIndex >= sorted.length) return;
+  // For RTL: 'right' arrow moves to a lower index, 'left' arrow moves to a higher index.
+  const newIndex = direction === 'right' ? currentIndex - 1 : currentIndex + 1;
+  
+  if (newIndex < 0 || newIndex >= sorted.length) return; // Already at an end
 
   const articleToMove = sorted[currentIndex];
   const otherArticle = sorted[newIndex];
 
   if (!articleToMove || !otherArticle) return;
-
-  const batch = writeBatch(firestore);
+  
+  // Directly swap their displayOrder values
   const orderToMove = articleToMove.displayOrder ?? currentIndex;
   const orderToSwap = otherArticle.displayOrder ?? newIndex;
 
+  const batch = writeBatch(firestore);
   batch.update(doc(firestore, 'knowledge_base_articles', articleToMove.id), { displayOrder: orderToSwap });
   batch.update(doc(firestore, 'knowledge_base_articles', otherArticle.id), { displayOrder: orderToMove });
 

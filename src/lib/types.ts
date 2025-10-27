@@ -9,6 +9,7 @@ export type Customer = {
   needs?: string;
   customerConcerns?: string;
   addedDate: any; // Can be a string or a Firestore Timestamp
+  displayOrder?: number;
 };
 
 export type Concern = {
@@ -34,3 +35,5 @@ export type Skill = {
   title: string;
   description: string;
 };
+
+    

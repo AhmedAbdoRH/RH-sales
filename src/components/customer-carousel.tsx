@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/carousel';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
-import { collection, limit, query } from 'firebase/firestore';
+import { collection, limit, query, orderBy } from 'firebase/firestore';
 import { Skeleton } from './ui/skeleton';
 import {
   Dialog,
@@ -23,7 +23,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Phone, Trash2, Pencil, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { deleteCustomer, updateCustomer } from '@/lib/data';
+import { deleteCustomer, updateCustomer, moveCustomer } from '@/lib/data';
 import { useState } from 'react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 import { Label } from './ui/label';
@@ -41,7 +41,7 @@ export function CustomerCarousel() {
 
   const customersQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return query(collection(firestore, 'customers'), limit(5));
+    return query(collection(firestore, 'customers'), orderBy('displayOrder', 'asc'));
   }, [firestore, user]);
 
   const { data: customers, isLoading } = useCollection<Customer>(customersQuery);
@@ -91,11 +91,10 @@ export function CustomerCarousel() {
     setSelectedCustomer(null);
   };
   
-  const handleMove = (direction: 'left' | 'right') => {
-    toast({
-        title: "قيد التطوير",
-        description: `سيتم تفعيل ميزة تحريك العميل للـ ${direction === 'left' ? 'يسار' : 'يمين'} قريباً.`,
-    });
+  const handleMove = (customerId: string, direction: 'left' | 'right') => {
+    if (firestore && customers) {
+      moveCustomer(firestore, customers, customerId, direction);
+    }
   };
 
 
@@ -120,11 +119,11 @@ export function CustomerCarousel() {
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-base font-medium">{customer.name}</CardTitle>
                       <div className="flex items-center">
-                          <Button variant="ghost" size="icon" onClick={() => handleMove('right')}>
+                          <Button variant="ghost" size="icon" onClick={() => handleMove(customer.id, 'right')}>
                             <ArrowRight className="h-4 w-4" />
                             <span className="sr-only">تحريك لليمين</span>
                           </Button>
-                           <Button variant="ghost" size="icon" onClick={() => handleMove('left')}>
+                           <Button variant="ghost" size="icon" onClick={() => handleMove(customer.id, 'left')}>
                             <ArrowLeft className="h-4 w-4" />
                             <span className="sr-only">تحريك لليسار</span>
                           </Button>
@@ -232,3 +231,5 @@ export function CustomerCarousel() {
     </>
   );
 }
+
+    

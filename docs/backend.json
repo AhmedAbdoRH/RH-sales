@@ -42,6 +42,10 @@
         "customerConcerns": {
           "type": "string",
           "description": "The concerns of the customer."
+        },
+        "displayOrder": {
+            "type": "number",
+            "description": "Used to order customers in the UI."
         }
       },
       "required": [
@@ -249,3 +253,5 @@
     ]
   }
 }
+
+    

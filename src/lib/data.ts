@@ -7,17 +7,26 @@ import {
   doc,
   deleteDoc,
   updateDoc,
-  type Firestore
+  type Firestore,
+  query,
+  orderBy,
+  limit,
+  getDocs,
+  writeBatch
 } from 'firebase/firestore';
 import { addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 type UpdatableCustomerData = Partial<Omit<Customer, 'id' | 'addedDate' | 'email'>>;
 
 
-export const addCustomer = (firestore: Firestore, customer: Partial<Omit<Customer, 'id' | 'addedDate'>>) => {
+export const addCustomer = async (firestore: Firestore, customer: Partial<Omit<Customer, 'id' | 'addedDate'>>) => {
   const customerCollection = collection(firestore, 'customers');
   const placeholderEmail = `${customer.name?.toLowerCase().replace(/\s/g, '.')}@placeholder.email`;
   
+  const q = query(customerCollection, orderBy('displayOrder', 'desc'), limit(1));
+  const querySnapshot = await getDocs(q);
+  const highestOrder = querySnapshot.empty ? 0 : (querySnapshot.docs[0].data().displayOrder || 0);
+
   const newCustomer = {
     name: customer.name || "Unnamed Customer",
     email: customer.email || placeholderEmail,
@@ -27,6 +36,7 @@ export const addCustomer = (firestore: Firestore, customer: Partial<Omit<Custome
     needs: customer.needs || '',
     customerConcerns: customer.customerConcerns || '',
     addedDate: Timestamp.now(),
+    displayOrder: highestOrder + 1,
   }
   addDocumentNonBlocking(customerCollection, newCustomer);
 };
@@ -41,6 +51,39 @@ export const deleteCustomer = (firestore: Firestore, customerId: string) => {
   deleteDocumentNonBlocking(customerDoc);
 };
 
+export const moveCustomer = async (firestore: Firestore, customers: Customer[], customerId: string, direction: 'left' | 'right') => {
+  const currentIndex = customers.findIndex(c => c.id === customerId);
+  if (currentIndex === -1) return;
+
+  const newIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
+  
+  if (newIndex < 0 || newIndex >= customers.length) {
+    return; // Already at the end or beginning
+  }
+
+  const customerToMove = customers[currentIndex];
+  const otherCustomer = customers[newIndex];
+
+  if (!customerToMove || !otherCustomer) return;
+
+  // Swap displayOrder values
+  const newOrderForMoved = otherCustomer.displayOrder;
+  const newOrderForOther = customerToMove.displayOrder;
+
+  const batch = writeBatch(firestore);
+
+  const movedCustomerRef = doc(firestore, 'customers', customerToMove.id);
+  batch.update(movedCustomerRef, { displayOrder: newOrderForMoved });
+
+  const otherCustomerRef = doc(firestore, 'customers', otherCustomer.id);
+  batch.update(otherCustomerRef, { displayOrder: newOrderForOther });
+
+  try {
+    await batch.commit();
+  } catch (error) {
+    console.error("Error moving customer:", error);
+  }
+};
 
 export const addConcern = (firestore: Firestore, customerId: string, concernText: string, summary: string, category: string) => {
     const concernsCollection = collection(firestore, 'customers', customerId, 'concerns');
@@ -64,3 +107,5 @@ export const addSkill = (firestore: Firestore, skill: Omit<Skill, 'id'>) => {
   const skillCollection = collection(firestore, 'skills');
   addDocumentNonBlocking(skillCollection, skill);
 };
+
+    

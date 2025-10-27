@@ -96,6 +96,7 @@ export function CustomerCarousel() {
 
     const formData = new FormData(event.currentTarget);
     const name = formData.get('name') as string;
+    const company = formData.get('company') as string;
     const phone = formData.get('phone') as string;
     const generalInfo = formData.get('generalInfo') as string;
     const needs = formData.get('needs') as string;
@@ -107,7 +108,7 @@ export function CustomerCarousel() {
         return;
     }
     
-    updateCustomer(firestore, selectedCustomer.id, { name, phone, generalInfo, needs, customerConcerns, bestTimeToContact });
+    updateCustomer(firestore, selectedCustomer.id, { name, company, phone, generalInfo, needs, customerConcerns, bestTimeToContact });
     toast({ title: "تم تحديث العميل", description: `تم تحديث بيانات ${name}.` });
     
     setEditDialogOpen(false);
@@ -145,7 +146,10 @@ export function CustomerCarousel() {
               <div className="p-1 h-full">
                   <Card className={cn("hover:border-primary transition-colors h-full flex flex-col", cardColors[idx % cardColors.length])}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-base font-medium">{customer.name}</CardTitle>
+                      <div className="space-y-0.5">
+                        <CardTitle className="text-base font-medium">{customer.name}</CardTitle>
+                        {customer.company && <p className="text-xs text-muted-foreground">{customer.company}</p>}
+                      </div>
                       <div className="flex items-center bg-card/50 backdrop-blur-sm rounded-full">
                           <Button variant="ghost" size="icon" onClick={() => handleMove(customer.id, 'right')} disabled={idx === 0}>
                             <ArrowRight className="h-4 w-4" />
@@ -165,7 +169,7 @@ export function CustomerCarousel() {
                           </Button>
                        </div>
                     </CardHeader>
-                    <CardContent className="flex-grow space-y-3 p-6 pt-0">
+                    <CardContent className="flex-grow space-y-3 p-6 pt-2">
                       {customer.generalInfo && (
                         <div>
                           <h4 className="text-sm font-semibold mb-1 text-info-title">معلومات</h4>
@@ -239,12 +243,8 @@ export function CustomerCarousel() {
                 <Input id="name" name="name" defaultValue={selectedCustomer?.name} className="col-span-3" required />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="phone" className="text-right">رقم الهاتف</Label>
-                <Input id="phone" name="phone" defaultValue={selectedCustomer?.phone} className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="bestTimeToContact" className="text-right">وقت التواصل</Label>
-                <Input id="bestTimeToContact" name="bestTimeToContact" defaultValue={selectedCustomer?.bestTimeToContact} className="col-span-3" placeholder="مثال: بعد 5 مساءً"/>
+                  <Label htmlFor="company" className="text-right">المجال</Label>
+                  <Input id="company" name="company" defaultValue={selectedCustomer?.company} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-start gap-4">
                 <Label htmlFor="generalInfo" className="text-right pt-2">معلومات</Label>
@@ -257,6 +257,14 @@ export function CustomerCarousel() {
               <div className="grid grid-cols-4 items-start gap-4">
                 <Label htmlFor="customerConcerns" className="text-right pt-2">المخاوف</Label>
                 <Textarea id="customerConcerns" name="customerConcerns" defaultValue={selectedCustomer?.customerConcerns} className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="phone" className="text-right">رقم الهاتف</Label>
+                <Input id="phone" name="phone" defaultValue={selectedCustomer?.phone} className="col-span-3" />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="bestTimeToContact" className="text-right">وقت التواصل</Label>
+                <Input id="bestTimeToContact" name="bestTimeToContact" defaultValue={selectedCustomer?.bestTimeToContact} className="col-span-3" placeholder="مثال: بعد 5 مساءً"/>
               </div>
             </div>
             <DialogFooter>

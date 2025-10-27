@@ -43,6 +43,7 @@ export function FloatingAddButton() {
     const formData = new FormData(event.currentTarget);
     
     const name = formData.get('name') as string;
+    const company = formData.get('company') as string;
     const phone = formData.get('phone') as string;
     const generalInfo = formData.get('generalInfo') as string;
     const needs = formData.get('needs') as string;
@@ -58,7 +59,7 @@ export function FloatingAddButton() {
         return;
     }
     
-    addCustomer(firestore, { name, phone, generalInfo, needs, customerConcerns, bestTimeToContact });
+    addCustomer(firestore, { name, company, phone, generalInfo, needs, customerConcerns, bestTimeToContact });
     
     setOpenDialog(null);
     toast({
@@ -183,17 +184,11 @@ export function FloatingAddButton() {
                   </Label>
                   <Input id="name" name="name" className="col-span-3" required />
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="phone" className="text-right">
-                    رقم الهاتف
-                  </Label>
-                  <Input id="phone" name="phone" className="col-span-3" />
-                </div>
                  <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="bestTimeToContact" className="text-right">
-                    وقت التواصل
+                  <Label htmlFor="company" className="text-right">
+                    المجال
                   </Label>
-                  <Input id="bestTimeToContact" name="bestTimeToContact" className="col-span-3" placeholder="مثال: بعد 5 مساءً" />
+                  <Input id="company" name="company" className="col-span-3" />
                 </div>
                 <div className="grid grid-cols-4 items-start gap-4">
                   <Label htmlFor="generalInfo" className="text-right pt-2">
@@ -212,6 +207,18 @@ export function FloatingAddButton() {
                     المخاوف
                   </Label>
                   <Textarea id="customerConcerns" name="customerConcerns" className="col-span-3" />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="phone" className="text-right">
+                    رقم الهاتف
+                  </Label>
+                  <Input id="phone" name="phone" className="col-span-3" />
+                </div>
+                 <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="bestTimeToContact" className="text-right">
+                    وقت التواصل
+                  </Label>
+                  <Input id="bestTimeToContact" name="bestTimeToContact" className="col-span-3" placeholder="مثال: بعد 5 مساءً" />
                 </div>
               </div>
               <DialogFooter>

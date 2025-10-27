@@ -117,17 +117,17 @@ export function FloatingAddButton() {
 
   return (
     <TooltipProvider>
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
         <div className="relative flex flex-col-reverse items-center gap-2">
            
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
                   <Button 
                       size="icon" 
-                      className="rounded-full w-14 h-14 shadow-lg bg-black/70 text-white backdrop-blur-sm border border-white/20 hover:bg-black"
+                      className="rounded-full w-16 h-16 shadow-lg bg-white/10 text-white backdrop-blur-sm border border-white/20 hover:bg-white/20"
                       onClick={() => setIsOpen(!isOpen)}
                   >
-                      <Plus className={cn("h-6 w-6 transition-transform duration-300", isOpen && "rotate-45")} />
+                      <Plus className={cn("h-7 w-7 transition-transform duration-300", isOpen && "rotate-45")} />
                   </Button>
               </TooltipTrigger>
               <TooltipContent side="top">

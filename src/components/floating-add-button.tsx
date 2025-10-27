@@ -117,20 +117,20 @@ export function FloatingAddButton() {
 
   return (
     <TooltipProvider>
-      <div className="fixed bottom-6 left-6 z-50">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
         <div className="relative flex flex-col-reverse items-center gap-2">
            
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
                   <Button 
                       size="icon" 
-                      className="rounded-full w-14 h-14 shadow-lg"
+                      className="rounded-full w-14 h-14 shadow-lg bg-black/70 text-white backdrop-blur-sm border border-white/20 hover:bg-black"
                       onClick={() => setIsOpen(!isOpen)}
                   >
                       <Plus className={cn("h-6 w-6 transition-transform duration-300", isOpen && "rotate-45")} />
                   </Button>
               </TooltipTrigger>
-              <TooltipContent side="left">
+              <TooltipContent side="top">
                   <p>{isOpen ? 'إغلاق' : 'إضافة جديدة'}</p>
               </TooltipContent>
             </Tooltip>
@@ -169,7 +169,7 @@ export function FloatingAddButton() {
       
       {/* Customer Dialog */}
       <Dialog open={openDialog === 'customer'} onOpenChange={(isOpen) => !isOpen && setOpenDialog(null)}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent>
             <form onSubmit={handleAddCustomer}>
               <DialogHeader>
                 <DialogTitle>إضافة عميل جديد</DialogTitle>
@@ -230,7 +230,7 @@ export function FloatingAddButton() {
       
       {/* Article Dialog */}
       <Dialog open={openDialog === 'article'} onOpenChange={(isOpen) => !isOpen && setOpenDialog(null)}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
             <form onSubmit={handleAddArticle}>
               <DialogHeader>
                 <DialogTitle>إضافة معلومة جديدة</DialogTitle>
@@ -255,7 +255,7 @@ export function FloatingAddButton() {
 
       {/* Skill Dialog */}
       <Dialog open={openDialog === 'skill'} onOpenChange={(isOpen) => !isOpen && setOpenDialog(null)}>
-         <DialogContent className="sm:max-w-[425px]">
+         <DialogContent>
             <form onSubmit={handleAddSkill}>
               <DialogHeader>
                 <DialogTitle>إضافة مهارة جديدة</DialogTitle>
@@ -280,5 +280,3 @@ export function FloatingAddButton() {
     </TooltipProvider>
   );
 }
-
-    

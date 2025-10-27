@@ -50,6 +50,10 @@
         "bestTimeToContact": {
           "type": "string",
           "description": "The best time to contact the customer."
+        },
+        "convictionScore": {
+          "type": "number",
+          "description": "A score from 1 to 5 representing the customer's conviction level."
         }
       },
       "required": [

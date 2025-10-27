@@ -21,15 +21,16 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Phone, Trash2, Pencil, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Phone, Trash2, Pencil, ArrowLeft, ArrowRight, ArrowUp, ArrowDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { deleteCustomer, updateCustomer, moveCustomer } from '@/lib/data';
+import { deleteCustomer, updateCustomer, moveCustomer, updateConvictionScore } from '@/lib/data';
 import { useState } from 'react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { cn } from '@/lib/utils';
+import { Badge } from './ui/badge';
 
 const cardColors = [
   'bg-card-blue',
@@ -60,9 +61,9 @@ export function CustomerCarousel() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
-  // Fetch all customers without ordering at the query level
   const customersQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
+    // Fetch all customers without ordering at the query level
     return query(collection(firestore, 'customers'));
   }, [firestore, user]);
 
@@ -121,6 +122,12 @@ export function CustomerCarousel() {
     }
   };
 
+  const handleScoreChange = (e: React.MouseEvent, customerId: string, currentScore: number, delta: 1 | -1) => {
+    e.stopPropagation();
+    if (firestore) {
+      updateConvictionScore(firestore, customerId, currentScore, delta);
+    }
+  };
 
   if (isLoading || isUserLoading) {
     return (
@@ -141,73 +148,98 @@ export function CustomerCarousel() {
     <>
       <Carousel opts={{ align: 'start', direction: 'rtl' }} className="w-full">
         <CarouselContent>
-          {sortedCustomers?.map((customer, idx) => (
-            <CarouselItem key={customer.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
-              <div className="p-1 h-full">
-                  <Card className={cn("hover:border-primary transition-colors h-full flex flex-col", cardColors[idx % cardColors.length])}>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <div className="space-y-0.5">
-                        <CardTitle className="text-base font-medium">{customer.name}</CardTitle>
-                        {customer.company && <p className="text-xs text-muted-foreground">{customer.company}</p>}
-                      </div>
-                      <div className="flex items-center bg-card/50 backdrop-blur-sm rounded-full">
-                          <Button variant="ghost" size="icon" onClick={() => handleMove(customer.id, 'right')} disabled={idx === 0}>
-                            <ArrowRight className="h-4 w-4" />
-                            <span className="sr-only">تحريك لليمين</span>
-                          </Button>
-                           <Button variant="ghost" size="icon" onClick={() => handleMove(customer.id, 'left')} disabled={idx === sortedCustomers.length - 1}>
-                            <ArrowLeft className="h-4 w-4" />
-                            <span className="sr-only">تحريك لليسار</span>
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={(e) => handleEditClick(e, customer)}>
-                            <Pencil className="h-4 w-4" />
-                            <span className="sr-only">تعديل</span>
-                          </Button>
-                          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={(e) => handleDeleteClick(e, customer.id)}>
-                            <Trash2 className="h-4 w-4" />
-                            <span className="sr-only">حذف</span>
-                          </Button>
-                       </div>
-                    </CardHeader>
-                    <CardContent className="flex-grow space-y-3 p-6 pt-2">
-                      {customer.generalInfo && (
-                        <div>
-                          <h4 className="text-sm font-semibold mb-1 text-info-title">معلومات</h4>
-                          <BulletPoints text={customer.generalInfo} />
+          {sortedCustomers?.map((customer, idx) => {
+            const score = customer.convictionScore ?? 1;
+            return (
+              <CarouselItem key={customer.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                <div className="p-1 h-full">
+                    <Card className={cn("hover:border-primary transition-colors h-full flex flex-col", cardColors[idx % cardColors.length])}>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-2">
+                            <CardTitle className="text-base font-medium">{customer.name}</CardTitle>
+                            <div className="flex items-center gap-1">
+                               <Button
+                                variant="ghost"
+                                size="icon"
+                                className="size-5"
+                                disabled={score <= 1}
+                                onClick={(e) => handleScoreChange(e, customer.id, score, -1)}
+                              >
+                                <ArrowDown className="h-4 w-4" />
+                              </Button>
+                              <Badge className="bg-green-700/50 text-green-100 border-green-600/50">{score}</Badge>
+                               <Button
+                                variant="ghost"
+                                size="icon"
+                                className="size-5"
+                                disabled={score >= 5}
+                                onClick={(e) => handleScoreChange(e, customer.id, score, 1)}
+                              >
+                                <ArrowUp className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                          {customer.company && <p className="text-xs text-muted-foreground">{customer.company}</p>}
                         </div>
-                      )}
-                      {customer.needs && (
-                         <div>
-                          <h4 className="text-sm font-semibold mb-1 text-needs-title">الاحتياجات</h4>
-                          <BulletPoints text={customer.needs} />
-                        </div>
-                      )}
-                      {customer.customerConcerns && (
-                        <div>
-                          <h4 className="text-sm font-semibold mb-1 text-concerns-title">المخاوف</h4>
-                          <BulletPoints text={customer.customerConcerns} />
-                        </div>
-                      )}
-                    </CardContent>
-                     {customer.phone && (
-                        <CardFooter className="pt-0 flex-col items-stretch">
-                            <Button variant="outline" size="sm" className="w-full" asChild>
-                                <a href={`tel:${customer.phone}`}>
-                                    <Phone className="ml-2 h-4 w-4" />
-                                    اتصال
-                                </a>
+                        <div className="flex items-center bg-card/50 backdrop-blur-sm rounded-full">
+                            <Button variant="ghost" size="icon" onClick={() => handleMove(customer.id, 'right')} disabled={idx === 0}>
+                              <ArrowRight className="h-4 w-4" />
+                              <span className="sr-only">تحريك لليمين</span>
                             </Button>
-                            {customer.bestTimeToContact && (
-                                <p className="text-center text-xs text-muted-foreground mt-2">
-                                    {customer.bestTimeToContact}
-                                </p>
-                            )}
-                        </CardFooter>
-                    )}
-                  </Card>
-              </div>
-            </CarouselItem>
-          ))}
+                             <Button variant="ghost" size="icon" onClick={() => handleMove(customer.id, 'left')} disabled={idx === sortedCustomers.length - 1}>
+                              <ArrowLeft className="h-4 w-4" />
+                              <span className="sr-only">تحريك لليسار</span>
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={(e) => handleEditClick(e, customer)}>
+                              <Pencil className="h-4 w-4" />
+                              <span className="sr-only">تعديل</span>
+                            </Button>
+                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={(e) => handleDeleteClick(e, customer.id)}>
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">حذف</span>
+                            </Button>
+                         </div>
+                      </CardHeader>
+                      <CardContent className="flex-grow space-y-3 p-6 pt-2">
+                        {customer.generalInfo && (
+                          <div>
+                            <h4 className="text-sm font-semibold mb-1 text-info-title">معلومات</h4>
+                            <BulletPoints text={customer.generalInfo} />
+                          </div>
+                        )}
+                        {customer.needs && (
+                           <div>
+                            <h4 className="text-sm font-semibold mb-1 text-needs-title">الاحتياجات</h4>
+                            <BulletPoints text={customer.needs} />
+                          </div>
+                        )}
+                        {customer.customerConcerns && (
+                          <div>
+                            <h4 className="text-sm font-semibold mb-1 text-concerns-title">المخاوف</h4>
+                            <BulletPoints text={customer.customerConcerns} />
+                          </div>
+                        )}
+                      </CardContent>
+                       {customer.phone && (
+                          <CardFooter className="pt-0 flex-col items-stretch">
+                              <Button variant="outline" size="sm" className="w-full" asChild>
+                                  <a href={`tel:${customer.phone}`}>
+                                      <Phone className="ml-2 h-4 w-4" />
+                                      اتصال
+                                  </a>
+                              </Button>
+                              {customer.bestTimeToContact && (
+                                  <p className="text-center text-xs text-muted-foreground mt-2">
+                                      {customer.bestTimeToContact}
+                                  </p>
+                              )}
+                          </CardFooter>
+                      )}
+                    </Card>
+                </div>
+              </CarouselItem>
+          )})}
         </CarouselContent>
         <CarouselPrevious />
         <CarouselNext />

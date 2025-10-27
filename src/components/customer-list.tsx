@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, PlusCircle, Phone } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, Phone, ArrowUp, ArrowDown } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -34,9 +34,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection } from 'firebase/firestore';
-import { addCustomer, deleteCustomer, updateCustomer } from '@/lib/data';
+import { addCustomer, deleteCustomer, updateConvictionScore, updateCustomer } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from './ui/textarea';
+import { Badge } from './ui/badge';
 
 const BulletPoints = ({ text }: { text: string | undefined }) => {
   if (!text) return null;
@@ -134,7 +135,19 @@ export function CustomerList() {
     return 'التاريخ غير متوفر';
   }
 
+  const handleScoreChange = (e: React.MouseEvent, customerId: string, currentScore: number, delta: 1 | -1) => {
+    e.stopPropagation();
+    if (firestore) {
+      updateConvictionScore(firestore, customerId, currentScore, delta);
+    }
+  };
+
   const showLoading = isLoading || isUserLoading;
+
+  // Sort customers locally. Customers without a displayOrder get a high value to be pushed to the end.
+  const sortedCustomers = customers 
+    ? [...customers].sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity))
+    : [];
 
   return (
     <>
@@ -153,11 +166,36 @@ export function CustomerList() {
             <Skeleton className="h-64 w-full" />
           </>
         )}
-        {!showLoading && customers?.map((customer) => (
+        {!showLoading && sortedCustomers.map((customer) => {
+          const score = customer.convictionScore ?? 1;
+          return (
           <Card key={customer.id} className="flex flex-col">
             <CardHeader className="flex flex-row items-start justify-between">
-              <div onClick={(e) => handleEditClick(e, customer)} className="cursor-pointer space-y-1.5">
-                <CardTitle className="text-xl">{customer.name}</CardTitle>
+              <div onClick={(e) => handleEditClick(e, customer)} className="cursor-pointer space-y-1.5 flex-1">
+                 <div className="flex items-center gap-2">
+                    <CardTitle className="text-xl">{customer.name}</CardTitle>
+                    <div className="flex items-center gap-1">
+                       <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-5"
+                        disabled={score <= 1}
+                        onClick={(e) => handleScoreChange(e, customer.id, score, -1)}
+                      >
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
+                      <Badge className="bg-green-700/50 text-green-100 border-green-600/50">{score}</Badge>
+                       <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-5"
+                        disabled={score >= 5}
+                        onClick={(e) => handleScoreChange(e, customer.id, score, 1)}
+                      >
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
                 {customer.company && <p className="text-xs text-muted-foreground">{customer.company}</p>}
                 <p className="text-xs text-muted-foreground">
                   تاريخ الانضمام: {formatDate(customer.addedDate)}
@@ -212,7 +250,7 @@ export function CustomerList() {
                 </CardFooter>
             )}
           </Card>
-        ))}
+        )})}
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

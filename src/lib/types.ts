@@ -11,6 +11,7 @@ export type Customer = {
   addedDate: any; // Can be a string or a Firestore Timestamp
   displayOrder?: number;
   bestTimeToContact?: string;
+  convictionScore?: number;
 };
 
 export type Concern = {

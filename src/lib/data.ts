@@ -39,6 +39,7 @@ export const addCustomer = async (firestore: Firestore, customer: Partial<Omit<C
     addedDate: Timestamp.now(),
     displayOrder: currentCount,
     bestTimeToContact: customer.bestTimeToContact || '',
+    convictionScore: 1, // Default conviction score
   }
   addDocumentNonBlocking(customerCollection, newCustomer);
 };
@@ -46,6 +47,14 @@ export const addCustomer = async (firestore: Firestore, customer: Partial<Omit<C
 export const updateCustomer = (firestore: Firestore, customerId: string, data: UpdatableCustomerData) => {
   const customerDoc = doc(firestore, 'customers', customerId);
   updateDocumentNonBlocking(customerDoc, data);
+};
+
+export const updateConvictionScore = (firestore: Firestore, customerId: string, currentScore: number, delta: 1 | -1) => {
+  const newScore = currentScore + delta;
+  if (newScore >= 1 && newScore <= 5) {
+    const customerDoc = doc(firestore, 'customers', customerId);
+    updateDocumentNonBlocking(customerDoc, { convictionScore: newScore });
+  }
 };
 
 export const deleteCustomer = async (firestore: Firestore, customerId: string, customers?: Customer[]) => {

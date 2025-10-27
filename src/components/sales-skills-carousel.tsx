@@ -116,7 +116,7 @@ export function SalesSkillsCarousel() {
             {sortedSkills?.map((skill, idx) => (
             <CarouselItem key={skill.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
                 <div className="p-1 h-full">
-                <Card className={cn(cardColors[idx % cardColors.length])}>
+                <Card className={cn("flex flex-col h-full", cardColors[idx % cardColors.length])}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
                         <CardTitle className="text-base font-medium">{skill.title}</CardTitle>
                         <div className="flex items-center bg-card/50 backdrop-blur-sm rounded-full">
@@ -138,7 +138,7 @@ export function SalesSkillsCarousel() {
                             </Button>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-4 pt-0">
+                    <CardContent className="p-4 pt-0 flex-grow">
                     <p className="text-sm text-muted-foreground">{skill.description}</p>
                     </CardContent>
                 </Card>

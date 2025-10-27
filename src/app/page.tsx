@@ -1,17 +1,9 @@
 'use client';
 
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { CustomerCarousel } from '@/components/customer-carousel';
 import { KnowledgeBaseCarousel } from '@/components/knowledge-base-carousel';
-import { SalesSkillsCarousel } from '@/components/sales-skills-carousel';
+import { SalesSkillsList } from '@/components/sales-skills-list';
 
 export default function DashboardPage() {
   return (
@@ -27,10 +19,10 @@ export default function DashboardPage() {
             <CustomerCarousel />
         </section>
 
-        {/* Section 2: Top Information (Knowledge Base) */}
+        {/* Section 2: Top Responses (Knowledge Base) */}
         <section>
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-semibold tracking-tight text-right">اهم الخبرات</h2>
+                <h2 className="text-2xl font-semibold tracking-tight text-right">اهم الردود</h2>
                  <Link href="/knowledge-base" className="text-sm font-medium text-primary hover:underline">
                     عرض الكل
                 </Link>
@@ -40,8 +32,8 @@ export default function DashboardPage() {
 
         {/* Section 3: Top Required Skills */}
         <section>
-            <h2 className="text-2xl font-semibold tracking-tight mb-4 text-right">اهم المهارات</h2>
-            <SalesSkillsCarousel />
+            <h2 className="text-2xl font-semibold tracking-tight mb-4 text-right">اهم المهارات والخبرات</h2>
+            <SalesSkillsList />
         </section>
     </div>
   );

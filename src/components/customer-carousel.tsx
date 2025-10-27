@@ -223,9 +223,9 @@ export function CustomerCarousel() {
                           </div>
                         )}
                       </CardContent>
-                       {customer.phone && (
+                       {(customer.phone || customer.bestTimeToContact) && (
                           <CardFooter className="pt-0 flex-col items-stretch">
-                               <div className="flex w-full gap-2">
+                               {customer.phone && <div className="flex w-full gap-2">
                                   <Button variant="outline" size="sm" className="flex-1" asChild>
                                       <a href={`https://wa.me/${cleanPhoneNumber}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
                                           <WhatsappIcon className="h-4 w-4" />
@@ -238,10 +238,10 @@ export function CustomerCarousel() {
                                           اتصال
                                       </a>
                                   </Button>
-                              </div>
+                              </div>}
                               {customer.bestTimeToContact && (
                                   <p className="text-center text-xs text-muted-foreground mt-2">
-                                      {customer.bestTimeToContact}
+                                      <span className="font-bold">الحالة:</span> {customer.bestTimeToContact}
                                   </p>
                               )}
                           </CardFooter>
@@ -305,8 +305,8 @@ export function CustomerCarousel() {
                 <Input id="phone" name="phone" defaultValue={selectedCustomer?.phone} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="bestTimeToContact" className="text-right">وقت التواصل</Label>
-                <Input id="bestTimeToContact" name="bestTimeToContact" defaultValue={selectedCustomer?.bestTimeToContact} className="col-span-3" placeholder="مثال: بعد 5 مساءً"/>
+                <Label htmlFor="bestTimeToContact" className="text-right">الحالة</Label>
+                <Input id="bestTimeToContact" name="bestTimeToContact" defaultValue={selectedCustomer?.bestTimeToContact} className="col-span-3" placeholder="مثال: مهتم، يحتاج متابعة"/>
               </div>
             </div>
             <DialogFooter>
@@ -318,3 +318,5 @@ export function CustomerCarousel() {
     </>
   );
 }
+
+    

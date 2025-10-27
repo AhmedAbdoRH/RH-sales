@@ -12,7 +12,8 @@ import {
   orderBy,
   limit,
   getDocs,
-  writeBatch
+  writeBatch,
+  getCountFromServer
 } from 'firebase/firestore';
 import { addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
@@ -23,9 +24,9 @@ export const addCustomer = async (firestore: Firestore, customer: Partial<Omit<C
   const customerCollection = collection(firestore, 'customers');
   const placeholderEmail = `${customer.name?.toLowerCase().replace(/\s/g, '.')}@placeholder.email`;
   
-  const q = query(customerCollection, orderBy('displayOrder', 'desc'), limit(1));
-  const querySnapshot = await getDocs(q);
-  const highestOrder = querySnapshot.empty ? 0 : (querySnapshot.docs[0].data().displayOrder || 0);
+  // Get the current number of customers to determine the next displayOrder
+  const snapshot = await getCountFromServer(customerCollection);
+  const currentCount = snapshot.data().count;
 
   const newCustomer = {
     name: customer.name || "Unnamed Customer",
@@ -36,7 +37,7 @@ export const addCustomer = async (firestore: Firestore, customer: Partial<Omit<C
     needs: customer.needs || '',
     customerConcerns: customer.customerConcerns || '',
     addedDate: Timestamp.now(),
-    displayOrder: highestOrder + 1,
+    displayOrder: currentCount,
   }
   addDocumentNonBlocking(customerCollection, newCustomer);
 };
@@ -107,5 +108,3 @@ export const addSkill = (firestore: Firestore, skill: Omit<Skill, 'id'>) => {
   const skillCollection = collection(firestore, 'skills');
   addDocumentNonBlocking(skillCollection, skill);
 };
-
-    

@@ -38,6 +38,7 @@ import { addCustomer, deleteCustomer, updateConvictionScore, updateCustomer } fr
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
+import { WhatsappIcon } from './whatsapp-icon';
 
 const BulletPoints = ({ text }: { text: string | undefined }) => {
   if (!text) return null;
@@ -236,12 +237,20 @@ export function CustomerList() {
             </CardContent>
             {customer.phone && (
                 <CardFooter className="flex-col items-stretch">
-                    <Button variant="outline" size="sm" className="w-full" asChild>
-                        <a href={`tel:${customer.phone}`}>
-                            <Phone className="ml-2 h-4 w-4" />
-                            اتصال
-                        </a>
-                    </Button>
+                     <div className="flex w-full gap-2">
+                        <Button variant="outline" size="sm" className="flex-1" asChild>
+                            <a href={`https://wa.me/${customer.phone.replace(/\+/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+                                <WhatsappIcon className="h-4 w-4" />
+                                واتساب
+                            </a>
+                        </Button>
+                        <Button variant="outline" size="sm" className="flex-1" asChild>
+                            <a href={`tel:${customer.phone}`} className="flex items-center justify-center gap-2">
+                                <Phone className="h-4 w-4" />
+                                اتصال
+                            </a>
+                        </Button>
+                    </div>
                     {customer.bestTimeToContact && (
                         <p className="text-center text-xs text-muted-foreground mt-2">
                             {customer.bestTimeToContact}

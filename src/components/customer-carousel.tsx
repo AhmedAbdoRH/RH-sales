@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/carousel';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
-import { collection, query } from 'firebase/firestore';
+import { collection, query, orderBy } from 'firebase/firestore';
 import { Skeleton } from './ui/skeleton';
 import {
   Dialog,
@@ -41,8 +41,7 @@ export function CustomerCarousel() {
 
   const customersQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    // Removing orderBy to ensure all customers are fetched, even without displayOrder
-    return query(collection(firestore, 'customers'));
+    return query(collection(firestore, 'customers'), orderBy('displayOrder'));
   }, [firestore, user]);
 
   const { data: customers, isLoading } = useCollection<Customer>(customersQuery);
@@ -60,8 +59,7 @@ export function CustomerCarousel() {
   
   const handleConfirmDelete = () => {
     if (firestore && customerToDelete && customers) {
-      // Also pass customers array to handle reordering after deletion if necessary
-      deleteCustomer(firestore, customerToDelete);
+      deleteCustomer(firestore, customerToDelete, customers);
       toast({
         title: "تم حذف العميل",
         description: "تم حذف العميل بنجاح من قاعدة البيانات.",
@@ -94,16 +92,8 @@ export function CustomerCarousel() {
   };
   
   const handleMove = (customerId: string, direction: 'left' | 'right') => {
-    if (firestore && customers) {
-      if (customers.every(c => c.displayOrder !== undefined)) {
-         moveCustomer(firestore, customers, customerId, direction);
-      } else {
-        toast({
-          title: "ميزة الترتيب غير متاحة",
-          description: "يرجى التأكد من أن جميع العملاء لديهم ترتيب عرض.",
-          variant: "destructive"
-        });
-      }
+    if (firestore && sortedCustomers) {
+       moveCustomer(firestore, sortedCustomers, customerId, direction);
     }
   };
 
@@ -118,7 +108,7 @@ export function CustomerCarousel() {
     );
   }
   
-  // Sort customers locally if displayOrder exists
+  // Sort customers locally to handle missing displayOrder
   const sortedCustomers = customers 
     ? [...customers].sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity))
     : [];

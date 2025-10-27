@@ -25,8 +25,8 @@ export const addCustomer = async (firestore: Firestore, customer: Partial<Omit<C
   const placeholderEmail = `${customer.name?.toLowerCase().replace(/\s/g, '.')}@placeholder.email`;
   
   // Get the current number of customers to determine the next displayOrder
-  const snapshot = await getCountFromServer(customerCollection);
-  const currentCount = snapshot.data().count;
+  const snapshot = await getDocs(customerCollection);
+  const currentCount = snapshot.size;
 
   const newCustomer = {
     name: customer.name || "Unnamed Customer",
@@ -47,37 +47,50 @@ export const updateCustomer = (firestore: Firestore, customerId: string, data: U
   updateDocumentNonBlocking(customerDoc, data);
 };
 
-export const deleteCustomer = (firestore: Firestore, customerId: string) => {
+export const deleteCustomer = async (firestore: Firestore, customerId: string, customers: Customer[]) => {
   const customerDoc = doc(firestore, 'customers', customerId);
-  deleteDocumentNonBlocking(customerDoc);
+  await deleteDoc(customerDoc);
+
+  // After deletion, re-order the remaining customers
+  const remainingCustomers = customers.filter(c => c.id !== customerId).sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity));
+  
+  const batch = writeBatch(firestore);
+  remainingCustomers.forEach((customer, index) => {
+    const docRef = doc(firestore, 'customers', customer.id);
+    batch.update(docRef, { displayOrder: index });
+  });
+
+  await batch.commit();
 };
 
 export const moveCustomer = async (firestore: Firestore, customers: Customer[], customerId: string, direction: 'left' | 'right') => {
-  const currentIndex = customers.findIndex(c => c.id === customerId);
+  const sortedCustomers = customers.sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity));
+  const currentIndex = sortedCustomers.findIndex(c => c.id === customerId);
+
   if (currentIndex === -1) return;
 
   const newIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
   
-  if (newIndex < 0 || newIndex >= customers.length) {
+  if (newIndex < 0 || newIndex >= sortedCustomers.length) {
     return; // Already at the end or beginning
   }
 
-  const customerToMove = customers[currentIndex];
-  const otherCustomer = customers[newIndex];
+  const customerToMove = sortedCustomers[currentIndex];
+  const otherCustomer = sortedCustomers[newIndex];
 
   if (!customerToMove || !otherCustomer) return;
 
-  // Swap displayOrder values
-  const newOrderForMoved = otherCustomer.displayOrder;
-  const newOrderForOther = customerToMove.displayOrder;
+  // Ensure both customers have a display order before swapping
+  const orderToMove = customerToMove.displayOrder ?? currentIndex;
+  const orderToSwap = otherCustomer.displayOrder ?? newIndex;
 
   const batch = writeBatch(firestore);
 
   const movedCustomerRef = doc(firestore, 'customers', customerToMove.id);
-  batch.update(movedCustomerRef, { displayOrder: newOrderForMoved });
+  batch.update(movedCustomerRef, { displayOrder: orderToSwap });
 
   const otherCustomerRef = doc(firestore, 'customers', otherCustomer.id);
-  batch.update(otherCustomerRef, { displayOrder: newOrderForOther });
+  batch.update(otherCustomerRef, { displayOrder: orderToMove });
 
   try {
     await batch.commit();

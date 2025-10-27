@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/carousel';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
-import { collection, query, orderBy } from 'firebase/firestore';
+import { collection, query } from 'firebase/firestore'; // Removed orderBy
 import { Skeleton } from './ui/skeleton';
 import {
   Dialog,
@@ -39,9 +39,10 @@ export function CustomerCarousel() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
+  // Fetch all customers without ordering at the query level
   const customersQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return query(collection(firestore, 'customers'), orderBy('displayOrder'));
+    return query(collection(firestore, 'customers'));
   }, [firestore, user]);
 
   const { data: customers, isLoading } = useCollection<Customer>(customersQuery);
@@ -108,7 +109,7 @@ export function CustomerCarousel() {
     );
   }
   
-  // Sort customers locally to handle missing displayOrder
+  // Sort customers locally. Customers without a displayOrder get a high value to be pushed to the end.
   const sortedCustomers = customers 
     ? [...customers].sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity))
     : [];
@@ -117,18 +118,18 @@ export function CustomerCarousel() {
     <>
       <Carousel opts={{ align: 'start', direction: 'rtl' }} className="w-full">
         <CarouselContent>
-          {sortedCustomers?.map((customer) => (
+          {sortedCustomers?.map((customer, idx) => (
             <CarouselItem key={customer.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
               <div className="p-1 h-full">
                   <Card className="hover:border-primary transition-colors h-full flex flex-col">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-base font-medium">{customer.name}</CardTitle>
                       <div className="flex items-center">
-                          <Button variant="ghost" size="icon" onClick={() => handleMove(customer.id, 'right')}>
+                          <Button variant="ghost" size="icon" onClick={() => handleMove(customer.id, 'right')} disabled={idx === 0}>
                             <ArrowRight className="h-4 w-4" />
                             <span className="sr-only">تحريك لليمين</span>
                           </Button>
-                           <Button variant="ghost" size="icon" onClick={() => handleMove(customer.id, 'left')}>
+                           <Button variant="ghost" size="icon" onClick={() => handleMove(customer.id, 'left')} disabled={idx === sortedCustomers.length - 1}>
                             <ArrowLeft className="h-4 w-4" />
                             <span className="sr-only">تحريك لليسار</span>
                           </Button>

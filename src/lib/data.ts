@@ -81,7 +81,7 @@ export const moveCustomer = async (firestore: Firestore, customers: Customer[], 
 
   if (currentIndex === -1) return;
 
-  const newIndex = direction === 'left' ? currentIndex + 1 : currentIndex - 1; // Adjusted for RTL
+  const newIndex = direction === 'right' ? currentIndex - 1 : currentIndex + 1;
   
   if (newIndex < 0 || newIndex >= sortedCustomers.length) {
     return; // Already at the end or beginning
@@ -163,7 +163,7 @@ export const moveKnowledgeBaseArticle = async (firestore: Firestore, articles: K
   const currentIndex = sorted.findIndex(a => a.id === articleId);
 
   if (currentIndex === -1) return;
-  const newIndex = direction === 'left' ? currentIndex + 1 : currentIndex - 1; // RTL
+  const newIndex = direction === 'right' ? currentIndex - 1 : currentIndex + 1; // RTL fix
   if (newIndex < 0 || newIndex >= sorted.length) return;
 
   const articleToMove = sorted[currentIndex];
@@ -218,7 +218,7 @@ export const moveSkill = async (firestore: Firestore, skills: Skill[], skillId: 
   const currentIndex = sorted.findIndex(s => s.id === skillId);
 
   if (currentIndex === -1) return;
-  const newIndex = direction === 'left' ? currentIndex + 1 : currentIndex - 1; // RTL
+  const newIndex = direction === 'right' ? currentIndex - 1 : currentIndex + 1; // RTL
   if (newIndex < 0 || newIndex >= sorted.length) return;
 
   const skillToMove = sorted[currentIndex];

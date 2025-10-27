@@ -22,6 +22,15 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
+import { cn } from '@/lib/utils';
+
+const cardColors = [
+  'bg-card-pink',
+  'bg-card-blue',
+  'bg-card-purple',
+  'bg-card-green',
+  'bg-card-orange'
+];
 
 export function SalesSkillsCarousel() {
   const firestore = useFirestore();
@@ -107,10 +116,10 @@ export function SalesSkillsCarousel() {
             {sortedSkills?.map((skill, idx) => (
             <CarouselItem key={skill.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
                 <div className="p-1 h-full">
-                <Card>
+                <Card className={cn(cardColors[idx % cardColors.length])}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
                         <CardTitle className="text-base font-medium">{skill.title}</CardTitle>
-                        <div className="flex items-center">
+                        <div className="flex items-center bg-card/50 backdrop-blur-sm rounded-full">
                              <Button variant="ghost" size="icon" onClick={() => handleMove(skill.id, 'right')} disabled={idx === 0}>
                                 <ArrowRight className="h-4 w-4" />
                                 <span className="sr-only">تحريك لليمين</span>

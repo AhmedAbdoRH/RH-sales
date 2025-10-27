@@ -21,7 +21,15 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { deleteKnowledgeBaseArticle, updateKnowledgeBaseArticle, moveKnowledgeBaseArticle } from '@/lib/data';
+import { cn } from '@/lib/utils';
 
+const cardColors = [
+  'bg-card-green',
+  'bg-card-orange',
+  'bg-card-pink',
+  'bg-card-blue',
+  'bg-card-purple'
+];
 
 export function KnowledgeBaseCarousel() {
   const firestore = useFirestore();
@@ -115,6 +123,7 @@ export function KnowledgeBaseCarousel() {
                     onMove={handleMove}
                     isFirst={idx === 0}
                     isLast={idx === sortedArticles.length - 1}
+                    className={cn(cardColors[idx % cardColors.length])}
                 />
                 </div>
             </CarouselItem>

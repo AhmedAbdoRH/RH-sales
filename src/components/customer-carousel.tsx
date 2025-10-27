@@ -29,6 +29,15 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
+import { cn } from '@/lib/utils';
+
+const cardColors = [
+  'bg-card-blue',
+  'bg-card-purple',
+  'bg-card-green',
+  'bg-card-orange',
+  'bg-card-pink'
+];
 
 
 export function CustomerCarousel() {
@@ -121,10 +130,10 @@ export function CustomerCarousel() {
           {sortedCustomers?.map((customer, idx) => (
             <CarouselItem key={customer.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
               <div className="p-1 h-full">
-                  <Card className="hover:border-primary transition-colors h-full flex flex-col">
+                  <Card className={cn("hover:border-primary transition-colors h-full flex flex-col", cardColors[idx % cardColors.length])}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-base font-medium">{customer.name}</CardTitle>
-                      <div className="flex items-center">
+                      <div className="flex items-center bg-card/50 backdrop-blur-sm rounded-full">
                           <Button variant="ghost" size="icon" onClick={() => handleMove(customer.id, 'right')} disabled={idx === 0}>
                             <ArrowRight className="h-4 w-4" />
                             <span className="sr-only">تحريك لليمين</span>

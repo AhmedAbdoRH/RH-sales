@@ -14,9 +14,10 @@ type KnowledgeBaseCardProps = {
   onMove: (articleId: string, direction: 'left' | 'right') => void;
   isFirst: boolean;
   isLast: boolean;
+  className?: string;
 };
 
-export function KnowledgeBaseCard({ article, onEdit, onDelete, onMove, isFirst, isLast }: KnowledgeBaseCardProps) {
+export function KnowledgeBaseCard({ article, onEdit, onDelete, onMove, isFirst, isLast, className }: KnowledgeBaseCardProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
@@ -39,10 +40,10 @@ export function KnowledgeBaseCard({ article, onEdit, onDelete, onMove, isFirst, 
   }
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card className={`h-full flex flex-col ${className}`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-base font-medium">{article.title}</CardTitle>
-        <div className="flex items-center">
+        <div className="flex items-center bg-card/50 backdrop-blur-sm rounded-full">
              <Button variant="ghost" size="icon" onClick={() => onMove(article.id, 'right')} disabled={isFirst}>
                 <ArrowRight className="h-4 w-4" />
                 <span className="sr-only">تحريك لليمين</span>

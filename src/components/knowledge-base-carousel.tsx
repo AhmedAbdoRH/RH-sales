@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import {
   Carousel,
@@ -12,18 +13,73 @@ import { Skeleton } from './ui/skeleton';
 import { collection, limit, query } from 'firebase/firestore';
 import type { KnowledgeBaseArticle } from '@/lib/types';
 import { KnowledgeBaseCard } from './knowledge-base-card';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
+import { Button } from './ui/button';
+import { Label } from './ui/label';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { deleteKnowledgeBaseArticle, updateKnowledgeBaseArticle } from '@/lib/data';
 
 
 export function KnowledgeBaseCarousel() {
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
+  const { toast } = useToast();
+
+  const [articleToDelete, setArticleToDelete] = useState<string | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedArticle, setSelectedArticle] = useState<KnowledgeBaseArticle | null>(null);
 
   const articlesQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
     return query(collection(firestore, 'knowledge_base_articles'), limit(5));
   }, [firestore, user]);
 
-  const { data: articles, isLoading } = useCollection<Omit<KnowledgeBaseArticle, 'id'>>(articlesQuery);
+  const { data: articles, isLoading } = useCollection<KnowledgeBaseArticle>(articlesQuery);
+  
+  const handleEditClick = (article: KnowledgeBaseArticle) => {
+    setSelectedArticle(article);
+    setEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = (articleId: string) => {
+    setArticleToDelete(articleId);
+  };
+  
+  const handleConfirmDelete = () => {
+    if (firestore && articleToDelete) {
+      deleteKnowledgeBaseArticle(firestore, articleToDelete);
+      toast({
+        title: "تم حذف المعلومة",
+        description: "تم حذف المعلومة بنجاح.",
+      });
+      setArticleToDelete(null);
+    }
+  };
+  
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!firestore || !selectedArticle) return;
+
+    const formData = new FormData(event.currentTarget);
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+    const category = formData.get('category') as string;
+    const tags = (formData.get('tags') as string).split(',').map(tag => tag.trim()).filter(Boolean);
+
+    if (!title || !content) {
+        toast({ title: "خطأ", description: "العنوان والمحتوى مطلوبان.", variant: "destructive" });
+        return;
+    }
+    
+    updateKnowledgeBaseArticle(firestore, selectedArticle.id, { title, content, category, tags });
+    toast({ title: "تم تحديث المعلومة", description: `تم تحديث "${title}".` });
+    
+    setEditDialogOpen(false);
+    setSelectedArticle(null);
+  };
 
   if (isLoading || isUserLoading) {
     return (
@@ -36,18 +92,73 @@ export function KnowledgeBaseCarousel() {
   }
   
   return (
-    <Carousel opts={{ align: 'start', direction: 'rtl' }} className="w-full">
-      <CarouselContent>
-        {articles?.map((article) => (
-          <CarouselItem key={article.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
-            <div className="p-1 h-full">
-              <KnowledgeBaseCard article={article as KnowledgeBaseArticle} />
-            </div>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
-    </Carousel>
+    <>
+        <Carousel opts={{ align: 'start', direction: 'rtl' }} className="w-full">
+        <CarouselContent>
+            {articles?.map((article) => (
+            <CarouselItem key={article.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                <div className="p-1 h-full">
+                <KnowledgeBaseCard 
+                    article={article} 
+                    onEdit={handleEditClick} 
+                    onDelete={handleDeleteClick} 
+                />
+                </div>
+            </CarouselItem>
+            ))}
+        </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
+        </Carousel>
+        
+        <AlertDialog open={!!articleToDelete} onOpenChange={(open) => !open && setArticleToDelete(null)}>
+            <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>هل أنت متأكد؟</AlertDialogTitle>
+                <AlertDialogDescription>
+                هذا الإجراء لا يمكن التراجع عنه. سيؤدي هذا إلى حذف المعلومة بشكل دائم.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive hover:bg-destructive/90">حذف</AlertDialogAction>
+            </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+
+        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+            <DialogContent className="sm:max-w-md">
+            <form onSubmit={handleFormSubmit}>
+                <DialogHeader>
+                <DialogTitle>تعديل المعلومة</DialogTitle>
+                <DialogDescription>
+                    قم بتحديث تفاصيل المعلومة أدناه.
+                </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="title" className="text-right">العنوان</Label>
+                    <Input id="title" name="title" defaultValue={selectedArticle?.title} className="col-span-3" required />
+                </div>
+                <div className="grid grid-cols-4 items-start gap-4">
+                    <Label htmlFor="content" className="text-right pt-2">المحتوى</Label>
+                    <Textarea id="content" name="content" defaultValue={selectedArticle?.content} className="col-span-3" required/>
+                </div>
+                 <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="category" className="text-right">الفئة</Label>
+                    <Input id="category" name="category" defaultValue={selectedArticle?.category} className="col-span-3" />
+                </div>
+                 <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="tags" className="text-right">الوسوم</Label>
+                    <Input id="tags" name="tags" defaultValue={selectedArticle?.tags.join(', ')} className="col-span-3" />
+                </div>
+                </div>
+                <DialogFooter>
+                <Button type="submit">حفظ التغييرات</Button>
+                </DialogFooter>
+            </form>
+            </DialogContent>
+        </Dialog>
+    </>
   );
 }

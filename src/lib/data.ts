@@ -47,20 +47,22 @@ export const updateCustomer = (firestore: Firestore, customerId: string, data: U
   updateDocumentNonBlocking(customerDoc, data);
 };
 
-export const deleteCustomer = async (firestore: Firestore, customerId: string, customers: Customer[]) => {
-  const customerDoc = doc(firestore, 'customers', customerId);
-  await deleteDoc(customerDoc);
+export const deleteCustomer = async (firestore: Firestore, customerId: string, customers?: Customer[]) => {
+    const customerDoc = doc(firestore, 'customers', customerId);
+    await deleteDoc(customerDoc);
 
-  // After deletion, re-order the remaining customers
-  const remainingCustomers = customers.filter(c => c.id !== customerId).sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity));
-  
-  const batch = writeBatch(firestore);
-  remainingCustomers.forEach((customer, index) => {
-    const docRef = doc(firestore, 'customers', customer.id);
-    batch.update(docRef, { displayOrder: index });
-  });
+    if (customers) {
+        // After deletion, re-order the remaining customers
+        const remainingCustomers = customers.filter(c => c.id !== customerId).sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity));
+        
+        const batch = writeBatch(firestore);
+        remainingCustomers.forEach((customer, index) => {
+            const docRef = doc(firestore, 'customers', customer.id);
+            batch.update(docRef, { displayOrder: index });
+        });
 
-  await batch.commit();
+        await batch.commit();
+    }
 };
 
 export const moveCustomer = async (firestore: Firestore, customers: Customer[], customerId: string, direction: 'left' | 'right') => {
@@ -69,7 +71,7 @@ export const moveCustomer = async (firestore: Firestore, customers: Customer[], 
 
   if (currentIndex === -1) return;
 
-  const newIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
+  const newIndex = direction === 'left' ? currentIndex + 1 : currentIndex - 1; // Adjusted for RTL
   
   if (newIndex < 0 || newIndex >= sortedCustomers.length) {
     return; // Already at the end or beginning
@@ -80,7 +82,6 @@ export const moveCustomer = async (firestore: Firestore, customers: Customer[], 
 
   if (!customerToMove || !otherCustomer) return;
 
-  // Ensure both customers have a display order before swapping
   const orderToMove = customerToMove.displayOrder ?? currentIndex;
   const orderToSwap = otherCustomer.displayOrder ?? newIndex;
 
@@ -112,12 +113,39 @@ export const addConcern = (firestore: Firestore, customerId: string, concernText
     addDocumentNonBlocking(concernsCollection, newConcern);
 };
 
-export const addKnowledgeBaseArticle = (firestore: Firestore, article: Omit<KnowledgeBaseArticle, 'id'>) => {
+export const addKnowledgeBaseArticle = (firestore: Firestore, article: Partial<Omit<KnowledgeBaseArticle, 'id'>>) => {
   const articleCollection = collection(firestore, 'knowledge_base_articles');
-  addDocumentNonBlocking(articleCollection, article);
+  const newArticle = {
+    title: article.title || 'بدون عنوان',
+    content: article.content || '',
+    category: article.category || 'عام',
+    tags: article.tags || []
+  };
+  addDocumentNonBlocking(articleCollection, newArticle);
 };
+
+export const updateKnowledgeBaseArticle = (firestore: Firestore, articleId: string, data: Partial<Omit<KnowledgeBaseArticle, 'id'>>) => {
+    const articleDoc = doc(firestore, 'knowledge_base_articles', articleId);
+    updateDocumentNonBlocking(articleDoc, data);
+};
+
+export const deleteKnowledgeBaseArticle = (firestore: Firestore, articleId: string) => {
+    const articleDoc = doc(firestore, 'knowledge_base_articles', articleId);
+    deleteDocumentNonBlocking(articleDoc);
+};
+
 
 export const addSkill = (firestore: Firestore, skill: Omit<Skill, 'id'>) => {
   const skillCollection = collection(firestore, 'skills');
   addDocumentNonBlocking(skillCollection, skill);
+};
+
+export const updateSkill = (firestore: Firestore, skillId: string, data: Partial<Omit<Skill, 'id'>>) => {
+    const skillDoc = doc(firestore, 'skills', skillId);
+    updateDocumentNonBlocking(skillDoc, data);
+};
+
+export const deleteSkill = (firestore: Firestore, skillId: string) => {
+    const skillDoc = doc(firestore, 'skills', skillId);
+    deleteDocumentNonBlocking(skillDoc);
 };

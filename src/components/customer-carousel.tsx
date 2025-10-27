@@ -21,7 +21,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Phone, Trash2, Pencil } from 'lucide-react';
+import { Phone, Trash2, Pencil, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { deleteCustomer, updateCustomer } from '@/lib/data';
 import { useState } from 'react';
@@ -90,6 +90,13 @@ export function CustomerCarousel() {
     setEditDialogOpen(false);
     setSelectedCustomer(null);
   };
+  
+  const handleMove = (direction: 'left' | 'right') => {
+    toast({
+        title: "قيد التطوير",
+        description: `سيتم تفعيل ميزة تحريك العميل للـ ${direction === 'left' ? 'يسار' : 'يمين'} قريباً.`,
+    });
+  };
 
 
   if (isLoading || isUserLoading) {
@@ -110,11 +117,17 @@ export function CustomerCarousel() {
             <CarouselItem key={customer.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
               <div className="p-1 h-full">
                   <Card className="hover:border-primary transition-colors h-full flex flex-col">
-                    <CardHeader className="flex flex-row items-start justify-between">
-                       <div className="space-y-1">
-                          <CardTitle className="text-base">{customer.name}</CardTitle>
-                       </div>
-                       <div className="flex items-center gap-1">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-base font-medium">{customer.name}</CardTitle>
+                      <div className="flex items-center">
+                          <Button variant="ghost" size="icon" onClick={() => handleMove('right')}>
+                            <ArrowRight className="h-4 w-4" />
+                            <span className="sr-only">تحريك لليمين</span>
+                          </Button>
+                           <Button variant="ghost" size="icon" onClick={() => handleMove('left')}>
+                            <ArrowLeft className="h-4 w-4" />
+                            <span className="sr-only">تحريك لليسار</span>
+                          </Button>
                           <Button variant="ghost" size="icon" onClick={(e) => handleEditClick(e, customer)}>
                             <Pencil className="h-4 w-4" />
                             <span className="sr-only">تعديل</span>

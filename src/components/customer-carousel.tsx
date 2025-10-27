@@ -98,10 +98,10 @@ export function CustomerCarousel() {
     const formData = new FormData(event.currentTarget);
     const name = formData.get('name') as string;
     const company = formData.get('company') as string;
-    const phone = formData.get('phone') as string;
     const generalInfo = formData.get('generalInfo') as string;
     const needs = formData.get('needs') as string;
     const customerConcerns = formData.get('customerConcerns') as string;
+    const phone = formData.get('phone') as string;
     const bestTimeToContact = formData.get('bestTimeToContact') as string;
 
     if (!name) {
@@ -168,7 +168,7 @@ export function CustomerCarousel() {
                               >
                                 <ArrowDown className="h-4 w-4" />
                               </Button>
-                              <Badge className="bg-green-700/50 text-green-100 border-green-600/50">{score}</Badge>
+                              <span className="font-bold text-yellow-400">+{score}</span>
                                <Button
                                 variant="ghost"
                                 size="icon"

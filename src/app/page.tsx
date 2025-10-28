@@ -18,7 +18,6 @@ export default function DashboardPage() {
 
         {/* Section 2: Top Required Skills */}
         <section>
-            <h2 className="text-2xl font-semibold tracking-tight mb-4 text-right">اهم المهارات والخبرات</h2>
             <ScrollingSkills />
         </section>
 

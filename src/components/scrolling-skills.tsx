@@ -1,12 +1,11 @@
 'use client';
 
 import type { Skill } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection, query } from 'firebase/firestore';
 import { Skeleton } from './ui/skeleton';
 import { cn } from '@/lib/utils';
-import { Fragment } from 'react';
 
 const cardColors = [
   'bg-card-pink',
@@ -17,12 +16,12 @@ const cardColors = [
 ];
 
 const SkillCard = ({ skill, className }: { skill: Skill; className?: string }) => (
-  <Card className={cn("flex flex-col h-full", className)}>
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
-      <CardTitle className="text-base font-medium">{skill.title}</CardTitle>
-    </CardHeader>
-    <CardContent className="p-4 pt-0 flex-grow">
-      <p className="text-sm text-card-foreground">{skill.description}</p>
+  <Card className={cn("flex flex-col h-full justify-center", className)}>
+    <CardContent className="p-4">
+      <div className="flex items-baseline gap-2 text-right">
+        <h3 className="text-base font-bold shrink-0">{skill.title}:</h3>
+        <p className="text-sm text-card-foreground">{skill.description}</p>
+      </div>
     </CardContent>
   </Card>
 );

@@ -53,7 +53,7 @@ export function ScrollingSkills() {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % skills.length);
         setIsVisible(true); // Start fade in
       }, 500); // Time for fade out transition
-    }, 4000); // Change skill every 4 seconds
+    }, 5000); // Change skill every 5 seconds
 
     return () => clearInterval(interval);
   }, [skills]);

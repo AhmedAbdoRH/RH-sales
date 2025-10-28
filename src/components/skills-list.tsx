@@ -55,8 +55,8 @@ export function SkillsList() {
     if (!firestore) return;
 
     const formData = new FormData(event.currentTarget);
-    const title = formData.get('description') as string; // Use description as title
     const description = formData.get('description') as string;
+    const title = description.split(' ').slice(0, 5).join(' '); // Use first 5 words as title
 
     if (!description) {
         toast({ title: "خطأ", description: "الوصف مطلوب.", variant: "destructive" });

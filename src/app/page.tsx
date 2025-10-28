@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { CustomerCarousel } from '@/components/customer-carousel';
 import { KnowledgeBaseCarousel } from '@/components/knowledge-base-carousel';
 import { SalesSkillsList } from '@/components/sales-skills-list';
@@ -12,9 +11,6 @@ export default function DashboardPage() {
         <section>
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold tracking-tight text-right">أهم العملاء</h2>
-                <Link href="/customers" className="text-sm font-medium text-primary hover:underline">
-                    عرض الكل
-                </Link>
             </div>
             <CustomerCarousel />
         </section>
@@ -29,9 +25,6 @@ export default function DashboardPage() {
         <section>
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold tracking-tight text-right">اهم الردود</h2>
-                 <Link href="/knowledge-base" className="text-sm font-medium text-primary hover:underline">
-                    عرض الكل
-                </Link>
             </div>
             <KnowledgeBaseCarousel />
         </section>

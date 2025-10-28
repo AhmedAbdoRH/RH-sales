@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { UserCircle, Settings, Users, BookOpen } from 'lucide-react';
+import { UserCircle, Settings, Users, BookOpen, Star } from 'lucide-react';
 import Link from 'next/link';
 import { Toaster } from "@/components/ui/toaster"
 import { FirebaseClientProvider } from '@/firebase';
@@ -72,12 +72,18 @@ export default function RootLayout({
                 </header>
                 <main className="flex-1 p-4 md:p-6 pb-20">{children}</main>
                  <FloatingAddButton />
-                 <footer className="fixed bottom-0 left-0 right-0 z-40 border-t bg-background/95 backdrop-blur-sm">
+                 <footer className="border-t bg-background/95 backdrop-blur-sm mt-auto">
                     <div className="container mx-auto flex h-16 items-center justify-center gap-4 px-4">
                         <Button variant="ghost" asChild>
                             <Link href="/customers" className="flex flex-col h-auto items-center gap-1">
                                 <Users className="h-5 w-5" />
                                 <span className="text-xs">كل العملاء</span>
+                            </Link>
+                        </Button>
+                        <Button variant="ghost" asChild>
+                            <Link href="/skills" className="flex flex-col h-auto items-center gap-1">
+                                <Star className="h-5 w-5" />
+                                <span className="text-xs">كل المهارات</span>
                             </Link>
                         </Button>
                         <Button variant="ghost" asChild>

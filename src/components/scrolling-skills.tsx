@@ -15,7 +15,7 @@ const SkillCard = ({ skill, isVisible }: { skill: Skill; isVisible: boolean }) =
     isVisible ? 'opacity-100' : 'opacity-0'
   )}>
     <CardContent className="p-4">
-      <div className="text-right">
+      <div className="text-center">
         <h3 className="text-base font-bold">{skill.title}</h3>
         <p className="text-sm text-card-foreground">{skill.description}</p>
       </div>

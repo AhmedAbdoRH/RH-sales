@@ -20,11 +20,11 @@ export default {
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
-          blue: '#030f1e',
-          purple: '#0f081c',
-          green: '#071712',
-          orange: '#1e1008',
-          pink: '#1c0812',
+          blue: '#030f1e99',
+          purple: '#0f081c99',
+          green: '#07171299',
+          orange: '#1e100899',
+          pink: '#1c081299',
         },
         popover: {
           DEFAULT: 'hsl(var(--popover))',

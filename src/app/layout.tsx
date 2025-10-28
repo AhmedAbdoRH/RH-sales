@@ -59,16 +59,6 @@ export default function RootLayout({
                     <div className="flex-1">
                         {/* Future home for breadcrumbs or global search */}
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" className="rounded-full">
-                            <Settings className="h-5 w-5" />
-                            <span className="sr-only">الإعدادات</span>
-                        </Button>
-                        <Button variant="ghost" size="icon" className="rounded-full">
-                            <UserCircle className="h-5 w-5" />
-                            <span className="sr-only">الملف الشخصي</span>
-                        </Button>
-                    </div>
                 </header>
                 <main className="flex-1 p-4 md:p-6">{children}</main>
                  <FloatingAddButton />

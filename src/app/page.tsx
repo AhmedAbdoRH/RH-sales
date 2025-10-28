@@ -2,7 +2,8 @@
 
 import { CustomerCarousel } from '@/components/customer-carousel';
 import { KnowledgeBaseCarousel } from '@/components/knowledge-base-carousel';
-import { SalesSkillsList } from '@/components/sales-skills-list';
+import { ScrollingSkills } from '@/components/scrolling-skills';
+
 
 export default function DashboardPage() {
   return (
@@ -18,7 +19,7 @@ export default function DashboardPage() {
         {/* Section 2: Top Required Skills */}
         <section>
             <h2 className="text-2xl font-semibold tracking-tight mb-4 text-right">اهم المهارات والخبرات</h2>
-            <SalesSkillsList />
+            <ScrollingSkills />
         </section>
 
         {/* Section 3: Top Responses (Knowledge Base) */}

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { UserCircle, Settings, Users, BookOpen, Star } from 'lucide-react';
+import { UserCircle, Settings, Users, BookOpen, Star, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { Toaster } from "@/components/ui/toaster"
 import { FirebaseClientProvider } from '@/firebase';
@@ -90,6 +90,12 @@ export default function RootLayout({
                             <Link href="/knowledge-base" className="flex flex-col h-auto items-center gap-1">
                                 <BookOpen className="h-5 w-5" />
                                 <span className="text-xs">كل الردود</span>
+                            </Link>
+                        </Button>
+                        <Button variant="ghost" asChild>
+                            <Link href="https://studio.firebase.google.com/u/1/studio-5838345520" target="_blank" className="flex flex-col h-auto items-center gap-1">
+                                <Sparkles className="h-5 w-5" />
+                                <span className="text-xs">مساعد AI</span>
                             </Link>
                         </Button>
                     </div>

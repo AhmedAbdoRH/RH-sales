@@ -92,8 +92,8 @@ export function SkillsList() {
   };
   
   const handleConfirmDelete = () => {
-    if (firestore && skillToDelete) {
-      deleteSkill(firestore, skillToDelete);
+    if (firestore && skillToDelete && skills) {
+      deleteSkill(firestore, skillToDelete, skills);
       toast({
         title: "تم حذف المهارة",
         variant: "destructive",

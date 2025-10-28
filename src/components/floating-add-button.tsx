@@ -117,7 +117,7 @@ export function FloatingAddButton() {
 
   return (
     <TooltipProvider>
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+      <div className="fixed bottom-20 left-8 z-50">
         <div className="relative flex flex-col-reverse items-center gap-2">
            
             <Tooltip delayDuration={0}>
@@ -130,7 +130,7 @@ export function FloatingAddButton() {
                       <Plus className={cn("h-7 w-7 transition-transform duration-300", isOpen && "rotate-45")} />
                   </Button>
               </TooltipTrigger>
-              <TooltipContent side="top">
+              <TooltipContent side="right">
                   <p>{isOpen ? 'إغلاق' : 'إضافة جديدة'}</p>
               </TooltipContent>
             </Tooltip>
@@ -156,7 +156,7 @@ export function FloatingAddButton() {
                                     <item.icon className="h-5 w-5" />
                                 </Button>
                             </TooltipTrigger>
-                            <TooltipContent side="left">
+                            <TooltipContent side="right">
                                 <p>إضافة {item.label}</p>
                             </TooltipContent>
                         </Tooltip>

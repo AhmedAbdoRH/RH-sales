@@ -72,7 +72,7 @@ export default function RootLayout({
                 </header>
                 <main className="flex-1 p-4 md:p-6 pb-20">{children}</main>
                  <FloatingAddButton />
-                 <footer className="border-t bg-background/95 backdrop-blur-sm mt-auto">
+                 <footer className="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur-sm mt-auto z-40">
                     <div className="container mx-auto flex h-16 items-center justify-center gap-4 px-4">
                         <Button variant="ghost" asChild>
                             <Link href="/customers" className="flex flex-col h-auto items-center gap-1">

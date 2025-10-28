@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { UserCircle, Settings } from 'lucide-react';
+import { UserCircle, Settings, Users, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { Toaster } from "@/components/ui/toaster"
 import { FirebaseClientProvider } from '@/firebase';
@@ -33,7 +33,7 @@ export default function RootLayout({
         <FirebaseClientProvider>
           <AuthProvider>
             <div className="flex flex-col min-h-screen w-full">
-                <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:h-[60px] lg:px-6">
+                <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:h-[60px] lg:px-6 sticky top-0 z-40">
                      <Link href="/" className="flex items-center gap-2 font-semibold">
                          <svg
                             className="size-8 shrink-0 text-primary"
@@ -70,8 +70,24 @@ export default function RootLayout({
                         </Button>
                     </div>
                 </header>
-                <main className="flex-1 p-4 md:p-6">{children}</main>
+                <main className="flex-1 p-4 md:p-6 pb-20">{children}</main>
                  <FloatingAddButton />
+                 <footer className="fixed bottom-0 left-0 right-0 z-40 border-t bg-background/95 backdrop-blur-sm">
+                    <div className="container mx-auto flex h-16 items-center justify-center gap-4 px-4">
+                        <Button variant="ghost" asChild>
+                            <Link href="/customers" className="flex flex-col h-auto items-center gap-1">
+                                <Users className="h-5 w-5" />
+                                <span className="text-xs">كل العملاء</span>
+                            </Link>
+                        </Button>
+                        <Button variant="ghost" asChild>
+                            <Link href="/knowledge-base" className="flex flex-col h-auto items-center gap-1">
+                                <BookOpen className="h-5 w-5" />
+                                <span className="text-xs">كل الردود</span>
+                            </Link>
+                        </Button>
+                    </div>
+                 </footer>
             </div>
             <Toaster />
           </AuthProvider>

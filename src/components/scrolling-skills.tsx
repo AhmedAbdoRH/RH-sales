@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import type { Skill } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
@@ -12,11 +13,15 @@ const cardColors = [
   'bg-card-blue',
   'bg-card-purple',
   'bg-card-green',
-  'bg-card-orange'
+  'bg-card-orange',
 ];
 
-const SkillCard = ({ skill, className }: { skill: Skill; className?: string }) => (
-  <Card className={cn("flex flex-col h-full justify-center", className)}>
+const SkillCard = ({ skill, className, isVisible }: { skill: Skill; className?: string; isVisible: boolean }) => (
+  <Card className={cn(
+    "flex flex-col h-full justify-center transition-opacity duration-500 ease-in-out",
+    isVisible ? 'opacity-100' : 'opacity-0',
+    className
+  )}>
     <CardContent className="p-4 whitespace-nowrap">
       <div className="flex items-baseline gap-2 text-right">
         <h3 className="text-base font-bold shrink-0">{skill.title}:</h3>
@@ -29,6 +34,8 @@ const SkillCard = ({ skill, className }: { skill: Skill; className?: string }) =
 export function ScrollingSkills() {
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(true);
 
   const skillsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
@@ -37,12 +44,24 @@ export function ScrollingSkills() {
 
   const { data: skills, isLoading } = useCollection<Skill>(skillsQuery);
 
+  useEffect(() => {
+    if (!skills || skills.length === 0) return;
+
+    const interval = setInterval(() => {
+      setIsVisible(false); // Start fade out
+      setTimeout(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % skills.length);
+        setIsVisible(true); // Start fade in
+      }, 500); // Time for fade out transition
+    }, 4000); // Change skill every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [skills]);
+
   if (isLoading || isUserLoading) {
     return (
-      <div className="flex space-x-4 rtl:space-x-reverse overflow-hidden">
-        {[...Array(6)].map((_, i) => (
-          <Skeleton key={i} className="h-20 w-80 shrink-0" />
-        ))}
+      <div className="flex justify-center items-center h-20">
+        <Skeleton className="h-20 w-80" />
       </div>
     );
   }
@@ -51,24 +70,23 @@ export function ScrollingSkills() {
     ? [...skills].sort((a, b) => (a.displayOrder ?? Infinity) - (b.displayOrder ?? Infinity))
     : [];
 
-  // Duplicate skills for a seamless loop
-  const skillsToRender = [...sortedSkills, ...sortedSkills];
+  const currentSkill = sortedSkills[currentIndex];
+
+  if (!currentSkill) {
+    return (
+        <div className="flex justify-center items-center h-20">
+            <p>لا توجد مهارات لعرضها.</p>
+        </div>
+    );
+  }
 
   return (
-    <div
-      className="w-full inline-flex flex-nowrap overflow-hidden"
-      style={{
-        maskImage:
-          'linear-gradient(to right, transparent 0, black 128px, black calc(100% - 200px), transparent 100%)',
-      }}
-    >
-      <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-scroll-horizontal">
-        {skillsToRender.map((skill, idx) => (
-            <li key={`${skill.id}-${idx}`} className='shrink-0'>
-                <SkillCard skill={skill} className={cn(cardColors[idx % cardColors.length])} />
-            </li>
-        ))}
-      </ul>
+    <div className="flex justify-center items-center h-20">
+        <SkillCard 
+            skill={currentSkill} 
+            className={cn(cardColors[currentIndex % cardColors.length])}
+            isVisible={isVisible}
+        />
     </div>
   );
 }

@@ -92,9 +92,3 @@
     @apply text-2xl;
   }
 }
-
-@layer utilities {
-  .animate-scroll-horizontal {
-    animation: scroll-horizontal 40s linear infinite;
-  }
-}

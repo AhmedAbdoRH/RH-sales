@@ -14,10 +14,10 @@ const SkillCard = ({ skill, isVisible }: { skill: Skill; isVisible: boolean }) =
     "flex flex-col h-20 justify-center transition-opacity duration-1000 ease-in-out border-none bg-transparent shadow-none",
     isVisible ? 'opacity-100' : 'opacity-0'
   )}>
-    <CardContent className="p-4 whitespace-nowrap">
-      <div className="flex items-baseline gap-2 text-right">
-        <h3 className="text-base font-bold shrink-0">{skill.title}</h3>
-        <p className="text-sm text-card-foreground">{skill.description}</p>
+    <CardContent className="p-4">
+      <div className="text-right">
+        <h3 className="text-base font-bold inline">{skill.title}</h3>
+        <p className="text-sm text-card-foreground inline ml-2">{skill.description}</p>
       </div>
     </CardContent>
   </Card>

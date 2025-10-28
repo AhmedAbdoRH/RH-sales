@@ -8,19 +8,11 @@ import { collection, query } from 'firebase/firestore';
 import { Skeleton } from './ui/skeleton';
 import { cn } from '@/lib/utils';
 
-const cardColors = [
-  'bg-card-pink',
-  'bg-card-blue',
-  'bg-card-purple',
-  'bg-card-green',
-  'bg-card-orange',
-];
 
-const SkillCard = ({ skill, className, isVisible }: { skill: Skill; className?: string; isVisible: boolean }) => (
+const SkillCard = ({ skill, isVisible }: { skill: Skill; isVisible: boolean }) => (
   <Card className={cn(
-    "flex flex-col h-full justify-center transition-opacity duration-500 ease-in-out",
-    isVisible ? 'opacity-100' : 'opacity-0',
-    className
+    "flex flex-col h-full justify-center transition-opacity duration-1000 ease-in-out border-none bg-transparent shadow-none",
+    isVisible ? 'opacity-100' : 'opacity-0'
   )}>
     <CardContent className="p-4 whitespace-nowrap">
       <div className="flex items-baseline gap-2 text-right">
@@ -52,8 +44,8 @@ export function ScrollingSkills() {
       setTimeout(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % skills.length);
         setIsVisible(true); // Start fade in
-      }, 500); // Time for fade out transition
-    }, 7000); // Change skill every 7 seconds
+      }, 1000); // Time for fade out transition
+    }, 8000); // Change skill every 8 seconds
 
     return () => clearInterval(interval);
   }, [skills]);
@@ -84,7 +76,6 @@ export function ScrollingSkills() {
     <div className="flex justify-center items-center h-20">
         <SkillCard 
             skill={currentSkill} 
-            className={cn(cardColors[currentIndex % cardColors.length])}
             isVisible={isVisible}
         />
     </div>

@@ -55,11 +55,11 @@ export function SkillsList() {
     if (!firestore) return;
 
     const formData = new FormData(event.currentTarget);
-    const title = formData.get('title') as string;
+    const title = formData.get('description') as string; // Use description as title
     const description = formData.get('description') as string;
 
-    if (!title || !description) {
-        toast({ title: "خطأ", description: "العنوان والوصف مطلوبان.", variant: "destructive" });
+    if (!description) {
+        toast({ title: "خطأ", description: "الوصف مطلوب.", variant: "destructive" });
         return;
     }
     
@@ -161,10 +161,6 @@ export function SkillsList() {
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="title" className="text-right">المهارة</Label>
-                <Input id="title" name="title" defaultValue={selectedSkill?.title} className="col-span-3" required />
-              </div>
               <div className="grid grid-cols-4 items-start gap-4">
                 <Label htmlFor="description" className="text-right pt-2">الوصف</Label>
                 <Textarea id="description" name="description" defaultValue={selectedSkill?.description} className="col-span-3" required />

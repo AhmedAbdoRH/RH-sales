@@ -17,7 +17,7 @@ const cardColors = [
 
 const SkillCard = ({ skill, className }: { skill: Skill; className?: string }) => (
   <Card className={cn("flex flex-col h-full justify-center", className)}>
-    <CardContent className="p-4">
+    <CardContent className="p-4 whitespace-nowrap">
       <div className="flex items-baseline gap-2 text-right">
         <h3 className="text-base font-bold shrink-0">{skill.title}:</h3>
         <p className="text-sm text-card-foreground">{skill.description}</p>
@@ -41,7 +41,7 @@ export function ScrollingSkills() {
     return (
       <div className="flex space-x-4 rtl:space-x-reverse overflow-hidden">
         {[...Array(6)].map((_, i) => (
-          <Skeleton key={i} className="h-32 w-72 shrink-0" />
+          <Skeleton key={i} className="h-20 w-80 shrink-0" />
         ))}
       </div>
     );
@@ -64,7 +64,7 @@ export function ScrollingSkills() {
     >
       <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-scroll-horizontal">
         {skillsToRender.map((skill, idx) => (
-            <li key={`${skill.id}-${idx}`} className='w-72 shrink-0'>
+            <li key={`${skill.id}-${idx}`} className='shrink-0'>
                 <SkillCard skill={skill} className={cn(cardColors[idx % cardColors.length])} />
             </li>
         ))}

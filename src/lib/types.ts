@@ -4,6 +4,8 @@ export type Customer = {
   email: string;
   company?: string;
   phone?: string;
+  phones?: string[];
+  website?: string;
   avatarUrl?: string;
   generalInfo?: string;
   needs?: string;

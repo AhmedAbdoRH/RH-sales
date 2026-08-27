@@ -19,6 +19,12 @@ import { addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlo
 
 type UpdatableCustomerData = Partial<Omit<Customer, 'id' | 'addedDate' | 'email'>>;
 
+const normalizePhones = (phones?: string[], primaryPhone?: string) => {
+  const values = [...(phones ?? []), primaryPhone ?? '']
+    .map((phone) => phone.trim())
+    .filter(Boolean);
+  return Array.from(new Set(values));
+};
 
 export const addCustomer = async (firestore: Firestore, customer: Partial<Omit<Customer, 'id' | 'addedDate'>>) => {
   const customerCollection = collection(firestore, 'customers');
@@ -27,12 +33,15 @@ export const addCustomer = async (firestore: Firestore, customer: Partial<Omit<C
   // Get the current number of customers to determine the next displayOrder
   const snapshot = await getDocs(customerCollection);
   const currentCount = snapshot.size;
-
+  const phones = normalizePhones(customer.phones, customer.phone);
+  
   const newCustomer = {
     name: customer.name || "Unnamed Customer",
     email: customer.email || placeholderEmail,
     company: customer.company || '',
-    phone: customer.phone || '',
+    phone: phones[0] || '',
+    phones,
+    website: customer.website || '',
     generalInfo: customer.generalInfo || '',
     needs: customer.needs || '',
     customerConcerns: customer.customerConcerns || '',
@@ -40,8 +49,8 @@ export const addCustomer = async (firestore: Firestore, customer: Partial<Omit<C
     displayOrder: currentCount,
     bestTimeToContact: customer.bestTimeToContact || '',
     convictionScore: 1, // Default conviction score
-  }
-  addDocumentNonBlocking(customerCollection, newCustomer);
+  };
+  await addDocumentNonBlocking(customerCollection, newCustomer);
 };
 
 export const updateCustomer = (firestore: Firestore, customerId: string, data: UpdatableCustomerData) => {
@@ -135,7 +144,7 @@ export const addKnowledgeBaseArticle = async (firestore: Firestore, article: Par
     tags: article.tags || [],
     displayOrder: currentCount,
   };
-  addDocumentNonBlocking(articleCollection, newArticle);
+  await addDocumentNonBlocking(articleCollection, newArticle);
 };
 
 export const updateKnowledgeBaseArticle = (firestore: Firestore, articleId: string, data: Partial<Omit<KnowledgeBaseArticle, 'id' | 'displayOrder'>>) => {
@@ -192,7 +201,7 @@ export const addSkill = async (firestore: Firestore, skill: Omit<Skill, 'id'>) =
       ...skill,
       displayOrder: currentCount
   }
-  addDocumentNonBlocking(skillCollection, newSkill);
+  await addDocumentNonBlocking(skillCollection, newSkill);
 };
 
 export const updateSkill = (firestore: Firestore, skillId: string, data: Partial<Omit<Skill, 'id'>>) => {

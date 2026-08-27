@@ -44,7 +44,12 @@ export function FloatingAddButton() {
     
     const name = formData.get('name') as string;
     const company = formData.get('company') as string;
-    const phone = formData.get('phone') as string;
+    const phoneValues = String(formData.get('phones') || formData.get('phone') || '')
+      .split(/[\n,،]+/)
+      .map((value) => value.trim())
+      .filter(Boolean);
+    const phone = phoneValues[0] || '';
+    const website = formData.get('website') as string;
     const generalInfo = formData.get('generalInfo') as string;
     const needs = formData.get('needs') as string;
     const customerConcerns = formData.get('customerConcerns') as string;
@@ -59,7 +64,7 @@ export function FloatingAddButton() {
         return;
     }
     
-    addCustomer(firestore, { name, company, phone, generalInfo, needs, customerConcerns, bestTimeToContact });
+    addCustomer(firestore, { name, company, phone, phones: phoneValues, website, generalInfo, needs, customerConcerns, bestTimeToContact });
     
     setOpenDialog(null);
     toast({
@@ -209,10 +214,16 @@ export function FloatingAddButton() {
                   <Textarea id="customerConcerns" name="customerConcerns" className="col-span-3" />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="phone" className="text-right">
-                    رقم الهاتف
+                  <Label htmlFor="website" className="text-right">
+                    الموقع
                   </Label>
-                  <Input id="phone" name="phone" className="col-span-3" />
+                  <Input id="website" name="website" type="url" className="col-span-3" dir="ltr" placeholder="https://example.com" />
+                </div>
+                <div className="grid grid-cols-4 items-start gap-4">
+                  <Label htmlFor="phones" className="text-right pt-2">
+                    أرقام الهاتف
+                  </Label>
+                  <Textarea id="phones" name="phones" className="col-span-3" dir="ltr" placeholder="رقم في كل سطر أو افصل بينهم بفاصلة" />
                 </div>
                  <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="bestTimeToContact" className="text-right">

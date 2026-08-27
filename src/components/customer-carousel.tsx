@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/carousel';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
-import { collection, query } from 'firebase/firestore'; 
-import { Skeleton } from './ui/skeleton';
+import { collection, orderBy, query } from 'firebase/firestore'; 
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
   DialogContent,
@@ -21,17 +21,17 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Phone, Trash2, Pencil, ArrowLeft, ArrowRight, ArrowUp, ArrowDown } from 'lucide-react';
+import { Phone, Trash2, Pencil, ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Globe } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { deleteCustomer, updateCustomer, moveCustomer, updateConvictionScore } from '@/lib/data';
 import { useState } from 'react';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
-import { Label } from './ui/label';
-import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { Badge } from './ui/badge';
-import { WhatsappIcon } from './whatsapp-icon';
+import { Badge } from '@/components/ui/badge';
+import { WhatsappIcon } from '@/components/whatsapp-icon';
 
 const cardColors = [
   'bg-card-blue',
@@ -64,8 +64,8 @@ export function CustomerCarousel() {
 
   const customersQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    // Fetch all customers without ordering at the query level
-    return query(collection(firestore, 'customers'));
+    // Keep the Firestore snapshot aligned with the intended carousel order.
+    return query(collection(firestore, 'customers'), orderBy('displayOrder', 'asc'));
   }, [firestore, user]);
 
   const { data: customers, isLoading } = useCollection<Customer>(customersQuery);
@@ -102,15 +102,20 @@ export function CustomerCarousel() {
     const generalInfo = formData.get('generalInfo') as string;
     const needs = formData.get('needs') as string;
     const customerConcerns = formData.get('customerConcerns') as string;
-    const phone = formData.get('phone') as string;
+    const phoneValues = String(formData.get('phones') || '')
+      .split(/[\n,،]+/)
+      .map((value) => value.trim())
+      .filter(Boolean);
+    const phone = phoneValues[0] || '';
     const bestTimeToContact = formData.get('bestTimeToContact') as string;
+    const website = formData.get('website') as string;
 
     if (!name) {
         toast({ title: "خطأ", description: "الاسم مطلوب.", variant: "destructive" });
         return;
     }
     
-    updateCustomer(firestore, selectedCustomer.id, { name, company, phone, generalInfo, needs, customerConcerns, bestTimeToContact });
+    updateCustomer(firestore, selectedCustomer.id, { name, company, phone, phones: phoneValues, website, generalInfo, needs, customerConcerns, bestTimeToContact });
     toast({ title: "تم تحديث العميل", description: `تم تحديث بيانات ${name}.` });
     
     setEditDialogOpen(false);
@@ -151,7 +156,11 @@ export function CustomerCarousel() {
         <CarouselContent>
           {sortedCustomers?.map((customer, idx) => {
             const score = customer.convictionScore ?? 1;
-            const cleanPhoneNumber = customer.phone?.replace(/\D/g, '');
+            const customerPhones = customer.phones?.length ? customer.phones : (customer.phone ? [customer.phone] : []);
+            const cleanPhoneNumber = (phone: string) => {
+              const digits = phone.replace(/\D/g, '');
+              return digits.startsWith('0') ? `20${digits.slice(1)}` : digits;
+            };
             return (
               <CarouselItem key={customer.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
                 <div className="p-1 h-full">
@@ -159,7 +168,10 @@ export function CustomerCarousel() {
                       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
-                            <CardTitle className="text-base font-medium">{customer.name}</CardTitle>
+                            <CardTitle className="text-base font-medium leading-6">
+                              <span>{customer.name}</span>
+                              {customer.company && <span className="text-muted-foreground"> — {customer.company}</span>}
+                            </CardTitle>
                             <div className="flex items-center gap-1">
                                <Button
                                 variant="ghost"
@@ -182,7 +194,18 @@ export function CustomerCarousel() {
                               </Button>
                             </div>
                           </div>
-                          {customer.company && <p className="text-xs text-muted-foreground">{customer.company}</p>}
+                          {customer.website && (
+                            <a
+                              href={customer.website.startsWith('http') ? customer.website : `https://${customer.website}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-1 inline-flex max-w-full items-center gap-1 text-xs text-primary underline-offset-2 hover:underline"
+                              dir="ltr"
+                            >
+                              <Globe className="h-3.5 w-3.5 shrink-0" />
+                              <span className="truncate">{customer.website}</span>
+                            </a>
+                          )}
                         </div>
                         <div className="flex items-center bg-card/50 backdrop-blur-sm rounded-full">
                             <Button variant="ghost" size="icon" onClick={() => handleMove(customer.id, 'right')} disabled={idx === 0}>
@@ -223,24 +246,26 @@ export function CustomerCarousel() {
                           </div>
                         )}
                       </CardContent>
-                       {(customer.phone || customer.bestTimeToContact) && (
-                          <CardFooter className="pt-0 flex-col items-stretch">
-                               {customer.phone && <div className="flex w-full gap-2">
+                       {(customerPhones.length > 0 || customer.bestTimeToContact) && (
+                          <CardFooter className="pt-0 flex-col items-stretch gap-2">
+                               {customerPhones.map((phone, phoneIndex) => (
+                                 <div key={`${customer.id}-phone-${phoneIndex}`} className="flex w-full gap-2">
                                   <Button variant="outline" size="sm" className="flex-1" asChild>
-                                      <a href={`https://wa.me/${cleanPhoneNumber}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+                                      <a href={`https://wa.me/${cleanPhoneNumber(phone)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
                                           <WhatsappIcon className="h-4 w-4" />
-                                          واتساب
+                                          واتساب {customerPhones.length > 1 ? phoneIndex + 1 : ''}
                                       </a>
                                   </Button>
                                   <Button variant="outline" size="sm" className="flex-1" asChild>
-                                      <a href={`tel:${customer.phone}`} className="flex items-center justify-center gap-2">
+                                      <a href={`tel:${phone}`} className="flex items-center justify-center gap-2" dir="ltr">
                                           <Phone className="h-4 w-4" />
-                                          اتصال
+                                          {phone}
                                       </a>
                                   </Button>
-                              </div>}
+                                 </div>
+                               ))}
                               {customer.bestTimeToContact && (
-                                  <p className="text-center text-xs text-muted-foreground mt-2">
+                                  <p className="text-center text-xs text-muted-foreground mt-1">
                                       {customer.bestTimeToContact}
                                   </p>
                               )}
@@ -301,8 +326,12 @@ export function CustomerCarousel() {
                 <Textarea id="customerConcerns" name="customerConcerns" defaultValue={selectedCustomer?.customerConcerns} className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="phone" className="text-right">رقم الهاتف</Label>
-                <Input id="phone" name="phone" defaultValue={selectedCustomer?.phone} className="col-span-3" />
+                <Label htmlFor="website" className="text-right">الموقع</Label>
+                <Input id="website" name="website" type="url" defaultValue={selectedCustomer?.website} className="col-span-3" dir="ltr" />
+              </div>
+              <div className="grid grid-cols-4 items-start gap-4">
+                <Label htmlFor="phones" className="text-right pt-2">أرقام الهاتف</Label>
+                <Textarea id="phones" name="phones" defaultValue={(selectedCustomer?.phones?.length ? selectedCustomer.phones : (selectedCustomer?.phone ? [selectedCustomer.phone] : [])).join('\n')} className="col-span-3" dir="ltr" placeholder="رقم في كل سطر أو افصل بينهم بفاصلة" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="bestTimeToContact" className="text-right">الحالة والوقت المناسب</Label>
